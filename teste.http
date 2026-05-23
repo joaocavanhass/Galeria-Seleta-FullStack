@@ -1,0 +1,402 @@
+# =========================================
+# Galeria Seleta — Testes completos de API
+# Siga a ordem numérica para evitar erros
+# =========================================
+
+@base = http://localhost:8080/api
+
+# =========================================
+# AUTH — AuthController + AuthService
+# UsuarioRepository: findByEmail, save
+# =========================================
+
+### 1. Registrar usuário
+POST {{base}}/auth/register
+Content-Type: application/json
+
+{
+  "nome": "João Silva",
+  "email": "joao@email.com",
+  "senha": "123456",
+  "telefone": "11999999999"
+}
+
+### 2. Registrar e-mail duplicado (deve retornar erro)
+POST {{base}}/auth/register
+Content-Type: application/json
+
+{
+  "nome": "Outro João",
+  "email": "joao@email.com",
+  "senha": "654321"
+}
+
+### 3. Login correto
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "joao@email.com",
+  "senha": "123456"
+}
+
+### 4. Login com senha errada (deve retornar erro)
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "joao@email.com",
+  "senha": "senhaerrada"
+}
+
+### 5. Logout
+POST {{base}}/auth/logout
+
+### 6. Esqueceu a senha (verifica se e-mail existe)
+POST {{base}}/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "joao@email.com"
+}
+
+### 7. Esqueceu a senha com e-mail inexistente (deve retornar erro)
+POST {{base}}/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "naoexiste@email.com"
+}
+
+# =========================================
+# USUÁRIO — UsuarioController + UsuarioService
+# UsuarioRepository: findById, save, deleteById
+# EnderecoRepository: findByUsuarioId, save, deleteById
+# =========================================
+
+### 8. Ver perfil
+GET {{base}}/usuarios/me
+
+### 9. Atualizar nome e telefone
+PUT {{base}}/usuarios/me
+Content-Type: application/json
+
+{
+  "nome": "João Atualizado",
+  "telefone": "11888888888"
+}
+
+### 10. Alterar senha
+PATCH {{base}}/usuarios/me/senha
+Content-Type: application/json
+
+{
+  "senha": "novaSenha123"
+}
+
+### 11. Adicionar endereço principal
+POST {{base}}/usuarios/me/enderecos
+Content-Type: application/json
+
+{
+  "rua": "Rua das Flores, 123",
+  "cidade": "São Paulo",
+  "estado": "SP",
+  "cep": "01310-100",
+  "principal": true
+}
+
+### 12. Adicionar segundo endereço
+POST {{base}}/usuarios/me/enderecos
+Content-Type: application/json
+
+{
+  "rua": "Av. Paulista, 1000",
+  "cidade": "São Paulo",
+  "estado": "SP",
+  "cep": "01310-200",
+  "principal": false
+}
+
+### 13. Listar endereços
+GET {{base}}/usuarios/me/enderecos
+
+### 14. Remover endereço
+DELETE {{base}}/usuarios/me/enderecos/2
+
+# =========================================
+# CATEGORIAS — CategoriaController + CategoriaService
+# CategoriaRepository: findAll, findById, save, deleteById
+# =========================================
+
+### 15. Criar categoria raiz
+POST {{base}}/categorias
+Content-Type: application/json
+
+{
+  "nome": "Roupas",
+  "nomeUrl": "roupas"
+}
+
+### 16. Criar subcategoria (categoriaMaeId = 1)
+POST {{base}}/categorias
+Content-Type: application/json
+
+{
+  "nome": "Camisetas",
+  "nomeUrl": "camisetas",
+  "categoriaMaeId": 1
+}
+
+### 17. Listar todas as categorias
+GET {{base}}/categorias
+
+### 18. Buscar categoria por ID
+GET {{base}}/categorias/1
+
+### 19. Atualizar categoria
+PUT {{base}}/categorias/2
+Content-Type: application/json
+
+{
+  "nome": "Camisetas Vintage",
+  "nomeUrl": "camisetas-vintage"
+}
+
+### 20. Desativar categoria
+PUT {{base}}/categorias/2
+Content-Type: application/json
+
+{
+  "ativo": false
+}
+
+### 21. Deletar categoria
+DELETE {{base}}/categorias/2
+
+# =========================================
+# PRODUTOS — ProdutoController + ProdutoService
+# ProdutoRepository: findAll, findByStatus, findById,
+#   findByCategoriaId, findByNomeContainingIgnoreCase,
+#   findByNovidade, findAllOrderByPrecoAsc,
+#   findAllOrderByPrecoDesc, save, deleteById
+# =========================================
+
+### 22. Criar produto 1
+POST {{base}}/produtos
+Content-Type: application/json
+
+{
+  "nome": "Camiseta Listrada",
+  "descricao": "Camiseta vintage listrada anos 80",
+  "preco": 59.90,
+  "categoriaId": 1,
+  "novidade": true,
+  "status": "disponivel"
+}
+
+### 23. Criar produto 2
+POST {{base}}/produtos
+Content-Type: application/json
+
+{
+  "nome": "Vestido Floral",
+  "descricao": "Vestido estampado anos 70",
+  "preco": 129.90,
+  "categoriaId": 1,
+  "novidade": false,
+  "status": "disponivel"
+}
+
+### 24. Criar produto 3 (inativo)
+POST {{base}}/produtos
+Content-Type: application/json
+
+{
+  "nome": "Calça Jeans",
+  "descricao": "Jeans clássico desbotado",
+  "preco": 89.90,
+  "categoriaId": 1,
+  "novidade": false,
+  "status": "inativo"
+}
+
+### 25. Listar todos os produtos (ativos)
+GET {{base}}/produtos
+
+### 26. Listar todos incluindo inativos
+GET {{base}}/produtos?status=todos
+
+### 27. Listar por menor preço
+GET {{base}}/produtos?ordenacao=menor-preco
+
+### 28. Listar por maior preço
+GET {{base}}/produtos?ordenacao=maior-preco
+
+### 29. Listar novidades
+GET {{base}}/produtos/novidades
+
+### 30. Buscar por nome
+GET {{base}}/produtos/busca?termo=camiseta
+
+### 31. Buscar produto por ID
+GET {{base}}/produtos/1
+
+### 32. Listar produtos por categoria
+GET {{base}}/categorias/1/produtos
+
+### 33. Atualizar produto
+PUT {{base}}/produtos/1
+Content-Type: application/json
+
+{
+  "nome": "Camiseta Listrada Vintage",
+  "preco": 69.90
+}
+
+### 34. Alterar status do produto
+PATCH {{base}}/produtos/3/status
+Content-Type: application/json
+
+{
+  "status": "disponivel"
+}
+
+### 35. Deletar produto
+DELETE {{base}}/produtos/3
+
+# =========================================
+# CARRINHO — CarrinhoController + CarrinhoService
+# CarrinhoRepository: findByUsuarioId,
+#   findByUsuarioIdAndProdutoId, deleteById, deleteAll
+# =========================================
+
+### 36. Ver carrinho (vazio)
+GET {{base}}/carrinho
+
+### 37. Adicionar produto 1 ao carrinho
+POST {{base}}/carrinho/itens
+Content-Type: application/json
+
+{
+  "produtoId": 1,
+  "quantidade": 1
+}
+
+### 38. Adicionar produto 2 ao carrinho
+POST {{base}}/carrinho/itens
+Content-Type: application/json
+
+{
+  "produtoId": 2,
+  "quantidade": 1
+}
+
+### 39. Adicionar produto já existente (não deve duplicar)
+POST {{base}}/carrinho/itens
+Content-Type: application/json
+
+{
+  "produtoId": 1,
+  "quantidade": 1
+}
+
+### 40. Ver carrinho com itens
+GET {{base}}/carrinho
+
+### 41. Remover item do carrinho (id do item = 2)
+DELETE {{base}}/carrinho/itens/2
+
+### 42. Ver carrinho após remoção
+GET {{base}}/carrinho
+
+### 43. Limpar carrinho
+DELETE {{base}}/carrinho
+
+### 44. Ver carrinho após limpar (deve estar vazio)
+GET {{base}}/carrinho
+
+# =========================================
+# PEDIDOS — PedidoController + PedidoService
+# PedidoRepository: findAll, findByStatus, findById, save
+# ItemPedidoRepository: save
+# =========================================
+
+### 45. Adicionar itens ao carrinho antes do pedido
+POST {{base}}/carrinho/itens
+Content-Type: application/json
+
+{
+  "produtoId": 1,
+  "quantidade": 1
+}
+
+### 46. Criar pedido
+POST {{base}}/pedidos
+Content-Type: application/json
+
+{
+  "usuarioId": 1,
+  "enderecoId": 1,
+  "produtoIds": [1, 2]
+}
+
+### 47. Listar todos os pedidos
+GET {{base}}/pedidos
+
+### 48. Listar pedidos por status
+GET {{base}}/pedidos?status=pendente
+
+### 49. Buscar pedido por ID
+GET {{base}}/pedidos/1
+
+### 50. Atualizar status do pedido (admin)
+PATCH {{base}}/pedidos/1/status
+Content-Type: application/json
+
+{
+  "status": "confirmado"
+}
+
+### 51. Cancelar pedido
+PATCH {{base}}/pedidos/1/cancelar
+
+### 52. Verificar status após cancelamento
+GET {{base}}/pedidos/1
+
+# =========================================
+# CONTATO — ContatoController + ContatoService
+# ContatoRepository: save
+# NewsletterRepository: findByEmail, save
+# =========================================
+
+### 53. Enviar mensagem de contato
+POST {{base}}/contato
+Content-Type: application/json
+
+{
+  "nome": "Maria",
+  "sobrenome": "Santos",
+  "email": "maria@email.com",
+  "telefone": "11977777777",
+  "mensagem": "Tenho interesse em peças dos anos 90, vocês têm?"
+}
+
+### 54. Inscrever na newsletter
+POST {{base}}/newsletter/inscrever
+Content-Type: application/json
+
+{
+  "email": "maria@email.com"
+}
+
+### 55. Inscrever mesmo e-mail (deve reativar, não duplicar)
+POST {{base}}/newsletter/inscrever
+Content-Type: application/json
+
+{
+  "email": "maria@email.com"
+}
+
+### 56. Cancelar inscrição na newsletter
+DELETE {{base}}/newsletter/cancelar?email=maria@email.com

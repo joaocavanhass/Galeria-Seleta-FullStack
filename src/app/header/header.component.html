@@ -1,0 +1,70 @@
+<header class="header">
+
+  <!-- ── Barra superior ── -->
+  <div class="header-top">
+
+    <!-- Esquerda: menu + busca -->
+    <div class="header-left">
+      <button class="btn-menu" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="search-bar">
+        <input type="text" placeholder="O que procura?" [(ngModel)]="termoBusca" />
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Centro: logo -->
+    <a class="header-logo" routerLink="/">
+      <img src="/LogoNova-removebg.png" alt="Galeria Seleta" class="logo-img" />
+      <div class="logo-texto">
+        <span class="logo-nome">Galeria</span>
+        <span class="logo-sub">Seleta</span>
+      </div>
+    </a>
+
+    <!-- Direita: carrinho + perfil -->
+    <div class="header-right">
+      <button class="btn-icone" aria-label="Carrinho" routerLink="/carrinho">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 01-8 0"/>
+        </svg>
+      </button>
+      <button class="btn-icone" aria-label="Perfil" routerLink="/perfil">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ── Navbar ── -->
+  <nav class="header-nav">
+    <a routerLink="/novidades" routerLinkActive="ativo">Novidades</a>
+
+    <div class="nav-dropdown">
+      <button class="nav-link" (click)="toggleProdutos()">
+        Produtos
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="dropdown-menu" [class.aberto]="produtosAberto">
+        <a routerLink="/produtos/camisetas" (click)="fecharDropdown()">Camisetas</a>
+        <a routerLink="/produtos/moletons"  (click)="fecharDropdown()">Moletons</a>
+        <a routerLink="/produtos/calcas"    (click)="fecharDropdown()">Calças</a>
+        <a routerLink="/produtos/jaquetas"  (click)="fecharDropdown()">Jaquetas</a>
+        <a routerLink="/produtos/calcados"  (click)="fecharDropdown()">Calçados</a>
+      </div>
+    </div>
+
+    <a routerLink="/sobre" routerLinkActive="ativo">Sobre Nós</a>
+  </nav>
+
+</header>

@@ -1,0 +1,51 @@
+<footer class="footer">
+  <div class="footer-container">
+
+
+    <div class="footer-section">
+      <h3>ENTRE EM CONTATO CONOSCO</h3>
+      <p>
+        Precisa de ajuda com seu pedido? Tem dúvida sobre os tamanhos?
+        Sinta-se à vontade para entrar em contato com nossa equipe
+      </p>
+
+      <p><strong>E-mail:</strong> GaleriaSeleta&#64;gmail.com</p>
+      <p><strong>Telefone:</strong> 11 9000-1111</p>
+
+      
+      <a routerLink="/contato">Ir para Contato</a>
+    </div>
+
+   
+    <div class="footer-section">
+      <h3>VENHA NOS VISITAR</h3>
+      <p>SEGUNDA - SEXTA 10:00 - 18:00</p>
+      <p>SÁBADO 10:00 - 17:00</p>
+
+      <p>AV. RIO BONITO<br>9021</p>
+
+    
+      <a routerLink="/localizacao">Ver no mapa</a>
+    </div>
+
+   
+    <div class="footer-section form">
+      <form (ngSubmit)="enviarFormulario()">
+        <div class="row">
+          <input type="text" placeholder="Nome" [(ngModel)]="form.nome" name="nome">
+          <input type="text" placeholder="Sobrenome" [(ngModel)]="form.sobrenome" name="sobrenome">
+        </div>
+
+        <div class="row">
+          <input type="email" placeholder="E-mail" [(ngModel)]="form.email" name="email">
+          <input type="text" placeholder="Telefone" [(ngModel)]="form.telefone" name="telefone">
+        </div>
+
+        <textarea placeholder="Deixe sua mensagem aqui..." [(ngModel)]="form.mensagem" name="mensagem"></textarea>
+
+        <button type="submit">Enviar</button>
+      </form>
+    </div>
+
+  </div>
+</footer>

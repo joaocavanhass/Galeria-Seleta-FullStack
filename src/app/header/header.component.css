@@ -1,0 +1,257 @@
+/* ════════════════════════════════════════════════════════════
+   VARIÁVEIS & HOST
+════════════════════════════════════════════════════════════ */
+:host {
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'Lato', Arial, sans-serif;
+  --cor-fundo:        #0f0f0f;
+  --cor-superficie:   #1e1e1e;
+  --cor-superficie-2: #3a3a3a;
+  --cor-texto:        #f2f2f0;
+  --cor-texto-muted:  #9a9895;
+  --cor-acento:       #e8441a;
+  display: block;
+}
+
+/* ════════════════════════════════════════════════════════════
+   HEADER — sticky
+════════════════════════════════════════════════════════════ */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--cor-fundo);
+  border-bottom: 1px solid var(--cor-superficie-2);
+}
+
+/* ── Barra superior ── */
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* ── Esquerda: hamburguer + busca ── */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.btn-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.btn-menu span {
+  display: block;
+  width: 22px;
+  height: 1.5px;
+  background: var(--cor-texto);
+  transition: background 0.2s;
+}
+
+.btn-menu:hover span { background: var(--cor-acento); }
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--cor-superficie-2);
+  border-radius: 20px;
+  padding: 5px 14px;
+  background: var(--cor-superficie);
+  transition: border-color 0.2s;
+}
+
+.search-bar:focus-within { border-color: var(--cor-acento); }
+
+.search-bar input {
+  background: none;
+  border: none;
+  outline: none;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--cor-texto);
+  width: 140px;
+}
+
+.search-bar input::placeholder { color: var(--cor-texto-muted); }
+.search-icon { color: var(--cor-texto-muted); flex-shrink: 0; }
+
+/* ── Centro: logo ── */
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: opacity 0.2s;
+}
+
+.header-logo:hover { opacity: 0.85; }
+
+/* Inverte o preto para branco mantendo o dourado intacto via brightness */
+.logo-img {
+  height: 52px;
+  width: auto;
+  /* Torna o preto visível no fundo escuro: inverte as cores escuras para branco */
+  filter: brightness(0) invert(1)
+          drop-shadow(0 0 6px rgba(255,255,255,0.15));
+  transition: filter 0.2s;
+}
+
+/* Como brightness+invert perde o dourado, recuperamos ele via hue-rotate
+   Alternativa: peça uma versão da logo com cabide branco */
+.logo-img {
+  filter:
+    invert(1)
+    sepia(0.5)
+    saturate(2)
+    hue-rotate(5deg)
+    drop-shadow(0 0 8px rgba(255,255,255,0.2));
+}
+
+.logo-texto {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.logo-nome {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--cor-texto);
+  letter-spacing: 0.02em;
+}
+
+.logo-sub {
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  color: var(--cor-texto-muted);
+  text-transform: uppercase;
+}
+
+/* ── Direita: ícones ── */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.btn-icone {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  color: var(--cor-texto);
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.btn-icone:hover { color: var(--cor-acento); }
+
+/* ── Navbar ── */
+.header-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 10px 32px;
+  border-top: 1px solid var(--cor-superficie-2);
+}
+
+.header-nav a {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: var(--cor-texto-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.header-nav a:hover,
+.header-nav a.ativo { color: var(--cor-texto); }
+
+/* Dropdown */
+.nav-dropdown { position: relative; }
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: var(--cor-texto-muted);
+  transition: color 0.2s;
+  padding: 0;
+}
+
+.nav-link:hover { color: var(--cor-texto); }
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-superficie-2);
+  border-top: 2px solid var(--cor-acento);
+  min-width: 160px;
+  flex-direction: column;
+  z-index: 200;
+}
+
+.dropdown-menu.aberto { display: flex; }
+
+.dropdown-menu a {
+  padding: 10px 18px;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: var(--cor-texto-muted);
+  transition: background 0.15s, color 0.15s;
+  border-bottom: 1px solid var(--cor-superficie-2);
+}
+
+.dropdown-menu a:last-child { border-bottom: none; }
+
+.dropdown-menu a:hover {
+  background: var(--cor-superficie-2);
+  color: var(--cor-acento);
+}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVO
+════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .header-top { padding: 10px 16px; }
+  .search-bar input { width: 100px; }
+  .logo-img { height: 40px; }
+  .logo-nome { font-size: 1rem; }
+  .header-nav { gap: 24px; padding: 10px 16px; }
+}

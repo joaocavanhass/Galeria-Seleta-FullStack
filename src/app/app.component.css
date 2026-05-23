@@ -1,0 +1,4 @@
+/* Compensa a altura do header sticky (top-bar + navbar ≈ 105px) */
+.main-content {
+  padding-top: 0; /* O header é sticky, não fixed, então não precisa de padding */
+}

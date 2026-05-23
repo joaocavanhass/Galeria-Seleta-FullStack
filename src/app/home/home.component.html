@@ -1,0 +1,92 @@
+<div class="home">
+
+  <!-- ══════════════════════════════════════════════
+       SEÇÃO HERO
+  ══════════════════════════════════════════════ -->
+  <section class="hero">
+
+    <!-- Carrossel de imagens (lado esquerdo) -->
+    <div class="hero-carousel"
+         (mouseenter)="pararAutoplay()"
+         (mouseleave)="iniciarAutoplay()">
+
+      <button class="carousel-arrow arrow-prev" (click)="anterior()" aria-label="Slide anterior">
+        &#8249;
+      </button>
+
+      <div class="carousel-viewport">
+        <div class="carousel-track"
+             [style.transform]="'translateX(-' + currentSlide * 100 + '%)'">
+          @for (slide of slides; track slide.id) {
+            <div class="carousel-slide">
+              @if (slide.url) {
+                <img [src]="slide.url" [alt]="slide.alt" />
+              } @else {
+                <div class="slide-placeholder"></div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <button class="carousel-arrow arrow-next" (click)="proximo()" aria-label="Próximo slide">
+        &#8250;
+      </button>
+
+      <!-- Dots indicadores -->
+      <div class="carousel-dots">
+        @for (slide of slides; track slide.id; let i = $index) {
+          <button class="dot" [class.ativo]="i === currentSlide" (click)="irPara(i)"
+                  [attr.aria-label]="'Ir para slide ' + (i + 1)">
+          </button>
+        }
+      </div>
+
+    </div>
+
+    <!-- Texto hero (lado direito) -->
+    <div class="hero-texto">
+      <h1 class="hero-titulo">
+        <span class="titulo-linha">Encontre</span>
+        <span class="titulo-linha">Peças</span>
+        <span class="titulo-linha titulo-italico">únicas</span>
+      </h1>
+      <p class="hero-subtitulo">
+        Descubra tesouro vintage<br>
+        e <em>peças exclusivas</em>
+      </p>
+      <a class="btn-compre" [routerLink]="['/produtos']">COMPRE AGORA</a>
+    </div>
+
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       SEÇÃO NOVIDADES
+  ══════════════════════════════════════════════ -->
+  <section class="novidades" id="novidades">
+
+    <h2 class="novidades-titulo">NOVIDADES</h2>
+
+    <div class="novidades-faixa">
+      <div class="marquee-track">
+        @for (produto of produtosMarquee; track $index) {
+          <div class="marquee-card" [routerLink]="['/produtos']">
+            <div class="card-imagem">
+              @if (produto.imagem_url) {
+                <img [src]="produto.imagem_url" [alt]="produto.nome" />
+              }
+            </div>
+            <div class="card-info">
+              <span class="card-nome">{{ produto.nome }}</span>
+              <span class="card-desc">
+                {{ produto.descricao }}. {{ precoFinal(produto) | currency:'BRL' }}
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+  </section>
+
+</div>
