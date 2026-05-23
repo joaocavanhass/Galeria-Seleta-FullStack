@@ -1,0 +1,145 @@
+<div class="dashboard">
+  <div class="page-header">
+    <h1>Dashboard</h1>
+    <p>Visão geral da loja em tempo real</p>
+  </div>
+
+  <!-- STAT CARDS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon users">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </div>
+      <div class="stat-body">
+        <span class="stat-label">Total de Usuários</span>
+        <span class="stat-value">{{ stats.totalUsuarios }}</span>
+        <span class="stat-delta up">↑ +12 este mês</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon orders">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+          <rect x="9" y="3" width="6" height="4" rx="2"/>
+          <line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/>
+        </svg>
+      </div>
+      <div class="stat-body">
+        <span class="stat-label">Total de Pedidos</span>
+        <span class="stat-value">{{ stats.totalPedidos }}</span>
+        <span class="stat-delta up">↑ +8 esta semana</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon products">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+      </div>
+      <div class="stat-body">
+        <span class="stat-label">Produtos em Estoque</span>
+        <span class="stat-value">{{ stats.produtosEstoque }}</span>
+        <span class="stat-delta warn">⚠ 3 com estoque baixo</span>
+      </div>
+    </div>
+
+    <div class="stat-card accent">
+      <div class="stat-icon revenue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        </svg>
+      </div>
+      <div class="stat-body">
+        <span class="stat-label">Receita Total</span>
+        <span class="stat-value">{{ formatCurrency(stats.receitaTotal) }}</span>
+        <span class="stat-delta up">↑ +18% vs. mês anterior</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-cols">
+    <!-- CHART -->
+    <div class="chart-card">
+      <div class="card-header">
+        <h2>Vendas — Últimos 7 dias</h2>
+        <span class="total-week">{{ formatCurrency(13500) }} esta semana</span>
+      </div>
+      <div class="bar-chart">
+        <div class="bar-group" *ngFor="let v of stats.vendasSemana">
+          <div class="bar-wrap">
+            <span class="bar-tip">{{ formatCurrency(v.valor) }}</span>
+            <div class="bar" [style.height.%]="getBarHeight(v.valor)"></div>
+          </div>
+          <span class="bar-label">{{ v.dia }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOW STOCK ALERT -->
+    <div class="alerts-card">
+      <div class="card-header">
+        <h2>⚠ Estoque Baixo</h2>
+      </div>
+      <div class="alert-list">
+        <div class="alert-item" *ngFor="let item of [
+          {nome:'Anel Solitário Ouro 18k', estoque: 2, limite: 5},
+          {nome:'Colar Choker Veludo Preto', estoque: 4, limite: 5},
+          {nome:'Pulseira Couro Trançado', estoque: 1, limite: 5}
+        ]">
+          <div class="alert-info">
+            <span class="alert-produto">{{ item.nome }}</span>
+            <span class="alert-stock" [class.critical]="item.estoque <= 2">{{ item.estoque }} unid.</span>
+          </div>
+          <div class="stock-bar-track">
+            <div class="stock-bar-fill" [style.width.%]="(item.estoque / item.limite) * 100"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECENT ORDERS -->
+  <div class="recent-orders-card">
+    <div class="card-header">
+      <h2>Pedidos Recentes</h2>
+      <a routerLink="/admin/pedidos" class="ver-todos">Ver todos →</a>
+    </div>
+    <div class="table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Pedido</th>
+            <th>Cliente</th>
+            <th>Data</th>
+            <th>Total</th>
+            <th>Pagamento</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of pedidosRecentes">
+            <td class="order-id">#{{ p.id }}</td>
+            <td>
+              <div class="client-cell">
+                <div class="client-avatar">{{ p.usuario_nome.charAt(0) }}</div>
+                <span>{{ p.usuario_nome }}</span>
+              </div>
+            </td>
+            <td class="date-cell">{{ p.criado_em }}</td>
+            <td class="value-cell">{{ formatCurrency(p.total) }}</td>
+            <td class="pay-cell">{{ p.forma_pagamento.replace('_', ' ') | titlecase }}</td>
+            <td><span class="status-badge" [ngClass]="getStatusClass(p.status)">{{ getStatusLabel(p.status) }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

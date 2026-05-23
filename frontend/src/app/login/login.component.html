@@ -1,0 +1,126 @@
+<div class="login"><link rel="stylesheet" href="./login.component.css" />
+
+  <!-- ══════════════════════════════════════════════
+       SEÇÃO HERO DO LOGIN
+  ══════════════════════════════════════════════ -->
+  <section class="login-hero">
+
+    <!-- Lado direito — formulário (mesmo flex: 0 0 56% do carrossel) -->
+    <div class="login-form-wrapper">
+
+      <form class="form" (ngSubmit)="onSubmit()" #f="ngForm" novalidate>
+
+        <header class="form-header">
+          <p class="form-rotulo">BEM-VINDO DE VOLTA</p>
+          <h2 class="form-titulo">Entrar</h2>
+        </header>
+
+        <!-- E-mail -->
+        <div class="campo" [class.campo--erro]="emailTocado && !emailValido">
+          <label class="campo__label">E-mail</label>
+          <input
+            type="email"
+            class="campo__input"
+            placeholder="seu@email.com"
+            [(ngModel)]="form.email"
+            name="email"
+            required
+            (blur)="emailTocado = true"
+          />
+          <span class="campo__msg-erro" *ngIf="emailTocado && !emailValido">
+            Insira um e-mail válido
+          </span>
+        </div>
+
+        <!-- Senha -->
+        <div class="campo" [class.campo--erro]="senhaTocada && !senhaValida">
+          <div class="campo__label-row">
+            <label class="campo__label">Senha</label>
+            <a routerLink="/esqueci-senha" class="link-esqueceu">Esqueceu a senha?</a>
+          </div>
+          <div class="campo__senha-wrap">
+            <input
+              [type]="mostrarSenha ? 'text' : 'password'"
+              class="campo__input"
+              placeholder="Sua senha"
+              [(ngModel)]="form.senha"
+              name="senha"
+              required
+              (blur)="senhaTocada = true"
+            />
+            <button type="button" class="btn-olho" (click)="mostrarSenha = !mostrarSenha" aria-label="Mostrar senha">
+              <svg *ngIf="!mostrarSenha" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg *ngIf="mostrarSenha" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
+          <span class="campo__msg-erro" *ngIf="senhaTocada && !senhaValida">
+            Campo obrigatório
+          </span>
+        </div>
+
+        <!-- Lembrar-me -->
+        <label class="campo-check">
+          <input type="checkbox" [(ngModel)]="form.lembrar" name="lembrar" />
+          <span class="check-box"></span>
+          <span class="check-texto">Lembrar-me neste dispositivo</span>
+        </label>
+
+        <!-- Feedbacks -->
+        <div class="alerta alerta--ok" *ngIf="mensagemSucesso">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          {{ mensagemSucesso }}
+        </div>
+        <div class="alerta alerta--erro" *ngIf="mensagemErro">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          {{ mensagemErro }}
+        </div>
+
+        <!-- Botão principal — idêntico ao btn-compre da home -->
+        <button type="submit" class="btn-entrar" [disabled]="carregando">
+          <span *ngIf="!carregando">ENTRAR</span>
+          <span *ngIf="carregando" class="spinner"></span>
+        </button>
+
+        <!-- Divisor -->
+        <div class="divisor">
+          <span class="divisor__linha"></span>
+          <span class="divisor__texto">ou</span>
+          <span class="divisor__linha"></span>
+        </div>
+
+        <!-- Criar conta -->
+        <a routerLink="/cadastro" class="btn-cadastro">CRIAR CONTA</a>
+
+      </form>
+    </div>
+
+    <!-- Lado esquerdo — texto editorial -->
+    <div class="login-texto">
+      <h1 class="login-titulo">
+        <span class="titulo-linha">Seu estilo,</span>
+        <span class="titulo-linha">sua</span>
+        <span class="titulo-linha titulo-italico">identidade</span>
+      </h1>
+      <p class="login-subtitulo">
+        Acesse sua conta e explore<br>
+        <em>peças selecionadas</em> para você
+      </p>
+    </div>
+
+  </section>
+
+  <!-- Faixa separadora — mesma da home -->
+  <div class="separador-faixa">
+    <span class="separador-texto">GALERIA SELETA — PEÇAS ÚNICAS</span>
+  </div>
+
+</div>

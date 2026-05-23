@@ -1,0 +1,432 @@
+/* ════════════════════════════════════════════════════════════
+   VARIÁVEIS — Urban Dark (idêntico ao resto do projeto)
+════════════════════════════════════════════════════════════ */
+:host {
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'Lato', Arial, sans-serif;
+
+  --cor-fundo:           #0f0f0f;
+  --cor-superficie:      #1e1e1e;
+  --cor-superficie-2:    #3a3a3a;
+  --cor-texto:           #f2f2f0;
+  --cor-texto-muted:     #9a9895;
+  --cor-acento:          #e8441a;
+  --cor-separador:       #e8441a;
+  --cor-erro:            #c0392b;
+  --cor-sucesso:         #27ae60;
+
+  display: block;
+  background: var(--cor-fundo);
+}
+
+.cadastro {
+  font-family: var(--font-body);
+  color: var(--cor-texto);
+  background: var(--cor-fundo);
+  min-height: 100vh;
+}
+
+/* ════════════════════════════════════════════════════════════
+   HERO DO CADASTRO
+   Espelho exato do .hero da home: flex, max-width 1200px,
+   mesmos paddings, mesma proporção de colunas
+════════════════════════════════════════════════════════════ */
+.cadastro-hero {
+  display: flex;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px 56px;
+  gap: 0;
+}
+
+/* ── Texto editorial (esquerda) ── */
+.cadastro-texto {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  padding-right: 32px;
+}
+
+.cadastro-titulo {
+  font-family: var(--font-display);
+  font-weight: 300;
+  line-height: 1.0;
+  color: var(--cor-texto);
+  margin: 0 0 18px;
+}
+
+.titulo-linha {
+  display: block;
+  font-size: clamp(3.5rem, 7vw, 5.6rem);
+  letter-spacing: -0.01em;
+}
+
+.titulo-italico {
+  font-style: italic;
+}
+
+.cadastro-subtitulo {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: var(--cor-texto-muted);
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+.cadastro-subtitulo em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--cor-texto);
+}
+
+.cadastro-link-login {
+  font-size: 0.8rem;
+  color: var(--cor-texto-muted);
+  margin: 0;
+}
+
+.link-acento {
+  color: var(--cor-acento);
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  margin-left: 4px;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.link-acento:hover {
+  border-bottom-color: var(--cor-acento);
+}
+
+/* ── Formulário (direita) ──
+   flex: 0 0 56% — mesmo que .hero-carousel na home
+════════════════════════════════════════════════════════════ */
+.cadastro-form-wrapper {
+  flex: 0 0 56%;
+  background: var(--cor-superficie);
+  border-radius: 12px;
+  padding: 40px 44px;
+  border-top: 2px solid var(--cor-separador);
+}
+
+/* ════════════════════════════════════════════════════════════
+   FORMULÁRIO
+════════════════════════════════════════════════════════════ */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.form-row .campo {
+  flex: 1;
+}
+
+/* ── Campo individual ── */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.campo__label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--cor-texto-muted);
+  transition: color 0.2s;
+}
+
+.campo:focus-within .campo__label {
+  color: var(--cor-acento);
+}
+
+.campo__input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--cor-superficie-2);
+  padding: 8px 0;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--cor-texto);
+  outline: none;
+  width: 100%;
+  transition: border-color 0.25s;
+  caret-color: var(--cor-acento);
+}
+
+.campo__input::placeholder {
+  color: var(--cor-superficie-2);
+  font-style: italic;
+}
+
+.campo__input:focus {
+  border-bottom-color: var(--cor-acento);
+}
+
+/* Estado de erro */
+.campo--erro .campo__input {
+  border-bottom-color: var(--cor-erro);
+}
+
+.campo--erro .campo__label {
+  color: var(--cor-erro);
+}
+
+.campo__msg-erro {
+  font-size: 0.68rem;
+  color: var(--cor-erro);
+  letter-spacing: 0.04em;
+  animation: fadeIn 0.2s ease;
+}
+
+/* ── Senha: wrapper com botão de olho ── */
+.campo__senha-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.campo__senha-wrap .campo__input {
+  padding-right: 32px;
+}
+
+.btn-olho {
+  position: absolute;
+  right: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--cor-texto-muted);
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.btn-olho:hover { color: var(--cor-acento); }
+
+/* ── Barra de força da senha ── */
+.forca-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.forca-barras {
+  display: flex;
+  gap: 4px;
+}
+
+.forca-traco {
+  display: block;
+  width: 36px;
+  height: 2px;
+  background: var(--cor-superficie-2);
+  border-radius: 2px;
+  transition: background 0.3s;
+}
+
+.forca-traco.fraca  { background: var(--cor-erro); }
+.forca-traco.media  { background: #e67e22; }
+.forca-traco.forte  { background: var(--cor-sucesso); }
+
+.forca-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: var(--cor-texto-muted);
+}
+
+/* ── Checkbox de termos ── */
+.campo-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.campo-check input[type='checkbox'] {
+  display: none;
+}
+
+.check-box {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--cor-superficie-2);
+  background: transparent;
+  margin-top: 1px;
+  position: relative;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.campo-check input[type='checkbox']:checked + .check-box {
+  background: var(--cor-acento);
+  border-color: var(--cor-acento);
+}
+
+.campo-check input[type='checkbox']:checked + .check-box::after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 4px;
+  width: 5px;
+  height: 9px;
+  border: 2px solid var(--cor-fundo);
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg);
+}
+
+.check-texto {
+  font-size: 0.78rem;
+  color: var(--cor-texto-muted);
+  line-height: 1.5;
+}
+
+.link-termos {
+  color: var(--cor-acento);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.link-termos:hover { border-bottom-color: var(--cor-acento); }
+
+/* ── Alertas ── */
+.alerta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  border-left: 2px solid;
+  animation: fadeIn 0.25s ease;
+}
+
+.alerta--ok {
+  background: rgba(39,174,96,0.08);
+  border-color: var(--cor-sucesso);
+  color: var(--cor-sucesso);
+}
+
+.alerta--erro-geral {
+  background: rgba(192,57,43,0.08);
+  border-color: var(--cor-erro);
+  color: var(--cor-erro);
+}
+
+/* ── Botão — idêntico ao btn-compre da home ── */
+.btn-cadastrar {
+  display: inline-block;
+  border: 1.5px solid var(--cor-acento);
+  padding: 12px 28px;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--cor-acento);
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s, opacity 0.25s;
+  width: 100%;
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-cadastrar:hover:not(:disabled) {
+  background: var(--cor-acento);
+  color: var(--cor-fundo);
+}
+
+.btn-cadastrar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Spinner de carregamento */
+.spinner {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(232,68,26,0.3);
+  border-top-color: var(--cor-acento);
+  border-radius: 50%;
+  animation: girar 0.7s linear infinite;
+}
+
+/* ════════════════════════════════════════════════════════════
+   FAIXA SEPARADORA — mesma da home (.novidades-titulo)
+════════════════════════════════════════════════════════════ */
+.separador-faixa {
+  text-align: center;
+  border-top: 2px solid var(--cor-separador);
+  padding: 24px 0;
+  background: var(--cor-fundo);
+}
+
+.separador-texto {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: 0.35em;
+  color: var(--cor-texto-muted);
+}
+
+/* ════════════════════════════════════════════════════════════
+   ANIMAÇÕES
+════════════════════════════════════════════════════════════ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes girar {
+  to { transform: rotate(360deg); }
+}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVO
+════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .cadastro-hero {
+    flex-direction: column;
+    padding: 24px 16px 40px;
+    gap: 32px;
+  }
+
+  /* Na mobile: texto fica centralizado, igual à home */
+  .cadastro-texto {
+    align-items: center;
+    text-align: center;
+    padding-right: 0;
+  }
+
+  /* Formulário ocupa largura total */
+  .cadastro-form-wrapper {
+    flex: unset;
+    width: 100%;
+    padding: 28px 20px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 22px;
+  }
+}

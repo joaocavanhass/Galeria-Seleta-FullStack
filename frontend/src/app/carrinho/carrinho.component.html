@@ -1,0 +1,97 @@
+<div class="cart-page">
+  <div class="cart-container">
+
+    <h1 class="cart-title">Sacola de compras</h1>
+
+    <!-- VAZIO -->
+    @if (itens.length === 0) {
+      <div class="cart-empty">
+        <p>Seu carrinho está vazio.</p>
+        <a routerLink="/produtos" class="checkout-btn">Ver produtos</a>
+      </div>
+    }
+
+    <!-- LISTA -->
+    @if (itens.length > 0) {
+      <div class="cart-list">
+        @for (item of itens; track item.id) {
+          <div class="cart-item">
+
+            <div class="item-image">
+              <img [src]="item.imagem" [alt]="item.nome">
+            </div>
+
+            <div class="item-info">
+
+              <div class="item-top">
+                <div>
+                  <h2>{{ item.nome }}</h2>
+                  <p>{{ item.descricao }}</p>
+                  @if (item.tamanho) {
+                    <span class="item-tamanho">Tamanho: {{ item.tamanho }}</span>
+                  }
+                </div>
+                <button class="remove-btn" (click)="removerItem(item.id, item.tamanho)">✕</button>
+              </div>
+
+              <div class="item-bottom">
+                <div class="quantity-box">
+                  <button (click)="diminuirQtd(item.id, item.tamanho)">-</button>
+                  <span>{{ item.quantidade }}</span>
+                  <button (click)="aumentarQtd(item.id, item.tamanho)">+</button>
+                </div>
+                <div class="price">
+                  {{ item.preco * item.quantidade | currency:'BRL' }}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- CUPOM -->
+      <div class="coupon-area">
+        <input
+          type="text"
+          placeholder="Cupom de desconto"
+          [(ngModel)]="cupomInput">
+        <button (click)="aplicarCupom()">Aplicar</button>
+      </div>
+      @if (cupomOk) {
+        <p class="cupom-msg cupom-msg--ok">✓ Cupom aplicado com sucesso!</p>
+      }
+      @if (cupomErro) {
+        <p class="cupom-msg cupom-msg--erro">Cupom inválido.</p>
+      }
+
+      <!-- RESUMO -->
+      <div class="summary">
+        <div class="summary-line">
+          <span>Subtotal</span>
+          <span>{{ subtotal | currency:'BRL' }}</span>
+        </div>
+        <div class="summary-line">
+          <span>Frete</span>
+          <span>Calculado no checkout</span>
+        </div>
+        @if (desconto > 0) {
+          <div class="summary-line desconto">
+            <span>Desconto ({{ srv.cupom() }})</span>
+            <span>- {{ desconto | currency:'BRL' }}</span>
+          </div>
+        }
+        <div class="summary-total">
+          <span>Total</span>
+          <span>{{ total | currency:'BRL' }}</span>
+        </div>
+      </div>
+
+      <!-- BOTÃO -->
+      <button class="checkout-btn" routerLink="/checkout">
+        Finalizar compra
+      </button>
+    }
+
+  </div>
+</div>

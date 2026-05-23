@@ -1,0 +1,168 @@
+<link rel="stylesheet" href="./cadastro.component.css">
+
+<div class="cadastro">
+
+  <!-- ══════════════════════════════════════════════
+       SEÇÃO HERO DO CADASTRO
+  ══════════════════════════════════════════════ -->
+  <section class="cadastro-hero">
+
+    <!-- Lado esquerdo — texto editorial (espelho do hero da home) -->
+    <div class="cadastro-texto">
+      <h1 class="cadastro-titulo">
+        <span class="titulo-linha">Crie sua</span>
+        <span class="titulo-linha">conta</span>
+        <span class="titulo-linha titulo-italico">exclusiva</span>
+      </h1>
+      <p class="cadastro-subtitulo">
+        Acesse peças únicas<br>
+        e <em>ofertas especiais</em>
+      </p>
+      <p class="cadastro-link-login">
+        Já tem cadastro?
+        <a routerLink="/login" class="link-acento">Entrar</a>
+      </p>
+    </div>
+
+    <!-- Lado direito — formulário (ocupa o espaço do carrossel) -->
+    <div class="cadastro-form-wrapper">
+
+      <form class="form" (ngSubmit)="onSubmit()" #f="ngForm" novalidate>
+
+        <!-- Nome + Sobrenome -->
+        <div class="form-row">
+          <div class="campo" [class.campo--erro]="nomeTocado && !nomeValido">
+            <label class="campo__label">Nome</label>
+            <input type="text" class="campo__input" placeholder="Seu nome"
+              [(ngModel)]="form.nome" name="nome" required (blur)="nomeTocado = true" />
+            <span class="campo__msg-erro" *ngIf="nomeTocado && !nomeValido">Obrigatório</span>
+          </div>
+
+          <div class="campo" [class.campo--erro]="sobrenomeTocado && !sobrenomeValido">
+            <label class="campo__label">Sobrenome</label>
+            <input type="text" class="campo__input" placeholder="Seu sobrenome"
+              [(ngModel)]="form.sobrenome" name="sobrenome" required (blur)="sobrenomeTocado = true" />
+            <span class="campo__msg-erro" *ngIf="sobrenomeTocado && !sobrenomeValido">Obrigatório</span>
+          </div>
+        </div>
+
+        <!-- E-mail -->
+        <div class="campo" [class.campo--erro]="emailTocado && !emailValido">
+          <label class="campo__label">E-mail</label>
+          <input type="email" class="campo__input" placeholder="seu@email.com"
+            [(ngModel)]="form.email" name="email" required (blur)="emailTocado = true" />
+          <span class="campo__msg-erro" *ngIf="emailTocado && !emailValido">Insira um e-mail válido</span>
+        </div>
+
+        <!-- CPF + Telefone -->
+        <div class="form-row">
+          <div class="campo">
+            <label class="campo__label">CPF</label>
+            <input type="text" class="campo__input" placeholder="000.000.000-00"
+              [(ngModel)]="form.cpf" name="cpf" maxlength="14" (input)="formatarCpf($event)" />
+          </div>
+
+          <div class="campo">
+            <label class="campo__label">Telefone</label>
+            <input type="text" class="campo__input" placeholder="(11) 90000-0000"
+              [(ngModel)]="form.telefone" name="telefone" maxlength="15" (input)="formatarTelefone($event)" />
+          </div>
+        </div>
+
+        <!-- Senha -->
+        <div class="campo" [class.campo--erro]="senhaTocada && !senhaValida">
+          <label class="campo__label">Senha</label>
+          <div class="campo__senha-wrap">
+            <input [type]="mostrarSenha ? 'text' : 'password'" class="campo__input"
+              placeholder="Mínimo 8 caracteres"
+              [(ngModel)]="form.senha" name="senha" required (blur)="senhaTocada = true" />
+            <button type="button" class="btn-olho" (click)="mostrarSenha = !mostrarSenha">
+              <svg *ngIf="!mostrarSenha" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg *ngIf="mostrarSenha" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="forca-wrap" *ngIf="form.senha.length > 0">
+            <div class="forca-barras">
+              <span class="forca-traco"
+                    [class.fraca]="forcaSenha === 1"
+                    [class.media]="forcaSenha === 2"
+                    [class.forte]="forcaSenha >= 3"></span>
+              <span class="forca-traco"
+                    [class.media]="forcaSenha === 2"
+                    [class.forte]="forcaSenha >= 3"></span>
+              <span class="forca-traco"
+                    [class.forte]="forcaSenha >= 3"></span>
+            </div>
+            <span class="forca-label">{{ labelForca }}</span>
+          </div>
+
+          <span class="campo__msg-erro" *ngIf="senhaTocada && !senhaValida">Mínimo 8 caracteres</span>
+        </div>
+
+        <!-- Confirmar Senha -->
+        <div class="campo" [class.campo--erro]="confirmarTocada && !senhasIguais">
+          <label class="campo__label">Confirmar senha</label>
+          <div class="campo__senha-wrap">
+            <input [type]="mostrarConfirmar ? 'text' : 'password'" class="campo__input"
+              placeholder="Repita a senha"
+              [(ngModel)]="form.confirmarSenha" name="confirmarSenha" required (blur)="confirmarTocada = true" />
+            <button type="button" class="btn-olho" (click)="mostrarConfirmar = !mostrarConfirmar">
+              <svg *ngIf="!mostrarConfirmar" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg *ngIf="mostrarConfirmar" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
+          <span class="campo__msg-erro" *ngIf="confirmarTocada && !senhasIguais">As senhas não conferem</span>
+        </div>
+
+        <!-- Termos -->
+        <label class="campo-check">
+          <input type="checkbox" [(ngModel)]="form.aceitaTermos" name="aceitaTermos" />
+          <span class="check-box"></span>
+          <span class="check-texto">
+            Li e aceito os
+            <a routerLink="/termos" class="link-termos">Termos de Uso</a>
+            e a
+            <a routerLink="/privacidade" class="link-termos">Política de Privacidade</a>
+          </span>
+        </label>
+
+        <!-- Feedbacks -->
+        <div class="alerta alerta--ok" *ngIf="mensagemSucesso">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          {{ mensagemSucesso }}
+        </div>
+        <div class="alerta alerta--erro-geral" *ngIf="mensagemErro">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          {{ mensagemErro }}
+        </div>
+
+        <!-- Botão — mesmo estilo do btn-compre da home -->
+        <button type="submit" class="btn-cadastrar" [disabled]="carregando">
+          <span *ngIf="!carregando">CRIAR CONTA</span>
+          <span *ngIf="carregando" class="spinner"></span>
+        </button>
+
+      </form>
+    </div>
+
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       FAIXA SEPARADORA — mesma da home
+  ══════════════════════════════════════════════ -->
+  <div class="separador-faixa">
+    <span class="separador-texto">GALERIA SELETA — PEÇAS ÚNICAS</span>
+  </div>
+
+</div>

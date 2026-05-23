@@ -1,0 +1,338 @@
+<div class="checkout">
+
+
+  <div class="checkout-hero">
+    <span class="checkout-hero__eyebrow">Galeria Seleta</span>
+
+    @if (step() === 1) {
+      <h1 class="checkout-hero__title">
+        <span class="linha">Finalizar</span>
+        <span class="linha linha--italic">compra</span>
+      </h1>
+    } @else if (step() === 2) {
+      <h1 class="checkout-hero__title">
+        <span class="linha">Pagamento</span>
+      </h1>
+      <p class="checkout-hero__sub">Forma de pagamento escolhida: <em>{{ labelPagto }}</em></p>
+    } @else {
+      <h1 class="checkout-hero__title">
+        <span class="linha">Pedido</span>
+        <span class="linha linha--italic">confirmado</span>
+      </h1>
+    }
+
+    <div class="checkout-hero__sep"></div>
+  </div>
+
+ 
+  @if (step() !== 3) {
+    <div class="steps">
+      <div class="step" [class.step--ativo]="step() === 1" [class.step--feito]="step() > 1">
+        <span class="step__num">{{ step() > 1 ? '✓' : '1' }}</span>
+        <span class="step__label">Entrega & Pagamento</span>
+      </div>
+      <div class="step__linha"></div>
+      <div class="step" [class.step--ativo]="step() === 2" [class.step--feito]="step() > 2">
+        <span class="step__num">2</span>
+        <span class="step__label">Confirmar pagamento</span>
+      </div>
+    </div>
+  }
+
+
+  @if (step() === 1) {
+    <div class="checkout-body">
+
+      <div class="col-esq">
+
+        <section class="bloco">
+          <h2 class="bloco__titulo">Informações de entrega</h2>
+          <div class="entrega-grid">
+            <div class="entrega-item">
+              <span class="entrega-icon">&#128100;</span>
+              <span>{{ usuario.nome }}</span>
+            </div>
+            <div class="entrega-item">
+              <span class="entrega-icon">&#128222;</span>
+              <span>{{ usuario.tel }}</span>
+            </div>
+            <div class="entrega-item entrega-item--full">
+              <span class="entrega-icon">&#128205;</span>
+              <span>{{ usuario.endereco }}</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="bloco">
+          <h2 class="bloco__titulo">Opções de frete</h2>
+          <div class="frete-lista">
+            @for (op of freteOpcoes; track op.id) {
+              <label
+                class="frete-item"
+                [class.frete-item--ativo]="freteSelecionado() === op.id"
+                (click)="selecionarFrete(op.id)"
+              >
+                <div class="frete-item__dados">
+                  <span class="frete-item__nome">{{ op.label }}</span>
+                  <span class="frete-item__prazo">{{ op.prazo }}</span>
+                </div>
+                <div class="frete-item__direita">
+                  @if (op.preco === null) {
+                    <span class="frete-item__preco frete-item__preco--gratis">Grátis</span>
+                  } @else {
+                    <span class="frete-item__preco">{{ op.preco | currency:'BRL' }}</span>
+                  }
+                  <input type="radio" name="frete" [value]="op.id" [checked]="freteSelecionado() === op.id" (change)="selecionarFrete(op.id)" />
+                </div>
+              </label>
+            }
+          </div>
+        </section>
+
+      </div>
+
+      <div class="col-dir">
+
+        <section class="bloco">
+          <h2 class="bloco__titulo">Opções de pagamento</h2>
+          <div class="pagto-lista">
+            @for (op of pagtoOpcoes; track op.id) {
+              <label
+                class="pagto-item"
+                [class.pagto-item--ativo]="pagtoSelecionado() === op.id"
+                (click)="selecionarPagto(op.id)"
+              >
+                <div class="pagto-item__texto">
+                  <span class="pagto-item__nome">{{ op.label }}</span>
+                  @if (op.badge) { <span class="pagto-item__badge">{{ op.badge }}</span> }
+                  @if (op.obs)   { <span class="pagto-item__obs">{{ op.obs }}</span> }
+                </div>
+                <input type="radio" name="pagamento" [value]="op.id" [checked]="pagtoSelecionado() === op.id" (change)="selecionarPagto(op.id)" />
+              </label>
+            }
+          </div>
+        </section>
+
+        <section class="bloco resumo">
+          <h2 class="bloco__titulo">Resumo do pedido</h2>
+
+          <!-- Itens do carrinho -->
+          <div class="resumo-itens">
+            @for (item of itens; track item.id) {
+              <div class="resumo-item">
+                <img class="resumo-item__img" [src]="item.imagem" [alt]="item.nome" />
+                <div class="resumo-item__info">
+                  <span class="resumo-item__nome">{{ item.nome }}</span>
+                  @if (item.tamanho) {
+                    <span class="resumo-item__detalhe">Tam: {{ item.tamanho }}</span>
+                  }
+                  <span class="resumo-item__detalhe">Qtd: {{ item.quantidade }}</span>
+                </div>
+                <span class="resumo-item__preco">{{ item.preco * item.quantidade | currency:'BRL' }}</span>
+              </div>
+            }
+          </div>
+
+          <div class="resumo-linhas">
+            <div class="resumo-linha">
+              <span>Subtotal <span class="muted">({{ totalItens }} {{ totalItens === 1 ? 'item' : 'itens' }})</span></span>
+              <span>{{ subtotal | currency:'BRL' }}</span>
+            </div>
+            <div class="resumo-linha">
+              <span>Frete</span>
+              <span>{{ freteValor === 0 ? 'Grátis' : (freteValor | currency:'BRL') }}</span>
+            </div>
+            @if (desconto > 0) {
+              <div class="resumo-linha resumo-linha--desconto">
+                <span>Cupom ({{ carrinho.cupom() }})</span>
+                <span>– {{ desconto | currency:'BRL' }}</span>
+              </div>
+            }
+            @if (descontoAtivo) {
+              <div class="resumo-linha resumo-linha--desconto">
+                <span>Desconto PIX (10%)</span>
+                <span>– {{ descontoPix | currency:'BRL' }}</span>
+              </div>
+            }
+          </div>
+          <div class="resumo-sep"></div>
+          <div class="resumo-total">
+            <span>Total</span>
+            <span class="resumo-total__valor">{{ totalFinal | currency:'BRL' }}</span>
+          </div>
+          <button class="btn-confirmar" (click)="confirmar()">
+            CONFIRMAR COMPRA &rsaquo;
+          </button>
+        </section>
+
+      </div>
+    </div>
+  }
+
+  @if (step() === 2) {
+    <div class="pagamento-body">
+
+      <div class="pag-esq">
+        <div class="bloco pag-resumo">
+          <p class="pag-label">PEDIDO:</p>
+          <p class="pag-numero">{{ numeroPedido() }}</p>
+        </div>
+
+        <div class="bloco pag-resumo">
+          <p class="pag-label">SUA COMPRA</p>
+          <p class="pag-valor">{{ totalFinal | currency:'BRL' }}</p>
+        </div>
+
+        <div class="bloco pag-metodo">
+          @if (pagtoSelecionado() === 'pix') {
+            <div class="pix-logo">
+              <span class="pix-icon">✦</span>
+              <span class="pix-text">pix</span>
+              <span class="pix-sub">powered by Banco Central</span>
+            </div>
+          }
+          @if (pagtoSelecionado() === 'cartao') {
+            <div class="cartao-display">
+              <span class="cartao-icon">&#128179;</span>
+              <span class="cartao-texto">Cartão de crédito</span>
+            </div>
+          }
+          @if (pagtoSelecionado() === 'boleto') {
+            <div class="cartao-display">
+              <span class="cartao-icon">&#128203;</span>
+              <span class="cartao-texto">Boleto bancário</span>
+            </div>
+          }
+          @if (pagtoSelecionado() === 'dinheiro') {
+            <div class="cartao-display">
+              <span class="cartao-icon">&#128176;</span>
+              <span class="cartao-texto">Dinheiro na retirada</span>
+            </div>
+          }
+        </div>
+
+        <button class="btn-voltar" (click)="voltarParaCheckout()">
+          &#8592; Alterar pedido
+        </button>
+      </div>
+
+      <div class="pag-dir">
+
+        @if (pagtoSelecionado() === 'pix') {
+          <div class="bloco pag-instrucoes">
+            <h3 class="pag-instrucoes__titulo">QrCode:</h3>
+            <div class="qr-area">
+              <div class="qr-placeholder">
+                <div class="qr-inner">
+                  <div class="qr-corner qr-corner--tl"></div>
+                  <div class="qr-corner qr-corner--tr"></div>
+                  <div class="qr-corner qr-corner--bl"></div>
+                  <div class="qr-dots"></div>
+                </div>
+              </div>
+            </div>
+            <div class="codigo-pix">{{ codigoPix }}</div>
+            <button class="btn-copiar" (click)="copiarCodigo()">
+              {{ copiado() ? '✓ CÓDIGO COPIADO' : 'COPIAR CÓDIGO' }}
+            </button>
+            <ol class="pix-passos">
+              <li>Abra o app da instituição</li>
+              <li>Escaneie o QrCode ou cole o código disponibilizado</li>
+              <li>Valide o código Pix</li>
+              <li>Finalize o pagamento</li>
+            </ol>
+            <button class="btn-confirmar btn-confirmar--full" style="margin-top:24px" (click)="finalizarPagamento()">
+              PAGAMENTO REALIZADO &rsaquo;
+            </button>
+          </div>
+        }
+
+        @if (pagtoSelecionado() === 'cartao') {
+          <div class="bloco pag-instrucoes">
+            <h3 class="pag-instrucoes__titulo">Dados do cartão:</h3>
+            <div class="cartao-form">
+              <input class="cartao-input" placeholder="Número do cartão" />
+              <input class="cartao-input" placeholder="Nome no cartão" />
+              <div class="cartao-form__row">
+                <input class="cartao-input" placeholder="Validade (MM/AA)" />
+                <input class="cartao-input" placeholder="CVV" />
+              </div>
+              <input class="cartao-input" placeholder="Parcelas" />
+              <button class="btn-confirmar btn-confirmar--full" (click)="finalizarPagamento()">
+                PAGAR {{ totalFinal | currency:'BRL' }} &rsaquo;
+              </button>
+            </div>
+          </div>
+        }
+
+        @if (pagtoSelecionado() === 'boleto') {
+          <div class="bloco pag-instrucoes">
+            <h3 class="pag-instrucoes__titulo">Seu boleto:</h3>
+            <p class="boleto-aviso">O boleto vence em <strong>3 dias úteis</strong>. Após o pagamento, a confirmação pode levar até 2 dias úteis.</p>
+            <button class="btn-confirmar btn-confirmar--full">&#128203; BAIXAR BOLETO</button>
+            <button class="btn-confirmar btn-confirmar--full" style="margin-top:12px" (click)="finalizarPagamento()">
+              JÁ PAGUEI O BOLETO &rsaquo;
+            </button>
+            <ol class="pix-passos" style="margin-top:20px">
+              <li>Baixe o boleto pelo botão acima</li>
+              <li>Pague em qualquer banco ou lotérica</li>
+              <li>Aguarde a confirmação por e-mail</li>
+            </ol>
+          </div>
+        }
+
+        @if (pagtoSelecionado() === 'dinheiro') {
+          <div class="bloco pag-instrucoes">
+            <h3 class="pag-instrucoes__titulo">Pagamento na retirada:</h3>
+            <p class="boleto-aviso">Leve o valor exato de <strong>{{ totalFinal | currency:'BRL' }}</strong> no momento da retirada na loja.</p>
+            <div class="endereco-loja">
+              <span class="entrega-icon">&#128205;</span>
+              <div>
+                <p>Av. Rio Bonito, 9021</p>
+                <p class="muted">SEG – SEX 10:00–18:00 &nbsp;|&nbsp; SÁB 10:00–17:00</p>
+              </div>
+            </div>
+            <button class="btn-confirmar btn-confirmar--full" style="margin-top:24px" (click)="finalizarPagamento()">
+              CONFIRMAR RETIRADA &rsaquo;
+            </button>
+          </div>
+        }
+
+      </div>
+    </div>
+  }
+
+  @if (step() === 3) {
+    <div class="sucesso-body">
+
+      <div class="sucesso-icone">
+        <svg class="sucesso-svg" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle class="sucesso-circulo" cx="60" cy="60" r="54" stroke="currentColor" stroke-width="2"/>
+          <polyline class="sucesso-check" points="35,62 53,80 85,42" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+   
+      <h2 class="sucesso-titulo">Pagamento realizado com sucesso</h2>
+      <p class="sucesso-sub">Muito obrigado por escolher a Galeria Seleta!</p>
+
+    
+      <div class="sucesso-pedido">
+        <span class="sucesso-pedido__label">Pedido</span>
+        <span class="sucesso-pedido__num">#{{ numeroPedido() }}</span>
+      </div>
+
+  
+      <div class="sucesso-acoes">
+        <button class="btn-sucesso btn-sucesso--sec" (click)="irParaPedidos()">
+          Acompanhar pedido
+        </button>
+        <button class="btn-sucesso btn-sucesso--ghost" (click)="irParaHome()">
+          Voltar à página inicial
+        </button>
+      </div>
+
+    </div>
+  }
+
+</div>

@@ -1,0 +1,65 @@
+/* Imports shared admin styles */
+@import '../admin-shared.css';
+
+.page-header { align-items: center; }
+.btn-primary {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 18px; background: #e8441a; color: #fff;
+  border: none; border-radius: 8px; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: all 0.18s; white-space: nowrap;
+  font-family: 'Lato', sans-serif;
+}
+.btn-primary svg { width: 16px; height: 16px; }
+.btn-primary:hover { background: #d63d18; box-shadow: 0 4px 16px rgba(232,68,26,0.3); }
+
+.filters-row {
+  display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 4px;
+  align-items: center;
+}
+.filters-row select {
+  background: #111; border: 1px solid #1e1e1e; border-radius: 8px;
+  color: #ccc; font-size: 13px; padding: 10px 14px;
+  cursor: pointer; outline: none;
+  font-family: 'Lato', sans-serif;
+}
+.filters-row select:focus { border-color: #e8441a; }
+
+.produto-cell { display: flex; align-items: center; gap: 12px; }
+.produto-thumb {
+  width: 40px; height: 40px; border-radius: 8px;
+  background: #1a1a1a; border: 1px solid #222;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; flex-shrink: 0;
+}
+.produto-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.produto-thumb span { color: #e8441a; font-size: 16px; }
+.produto-nome { font-size: 13px; color: #f2f2f0; font-weight: 500; margin-bottom: 2px; }
+.produto-id   { font-size: 11px; color: #555; font-family: monospace; }
+
+.price-cell { display: flex; flex-direction: column; gap: 2px; }
+.price-cell span { font-size: 13px; font-weight: 600; color: #f2f2f0; }
+.preco-desconto { font-size: 11px; color: #e8441a; font-weight: 600; }
+.low-stock { color: #ef4444 !important; font-weight: 700; }
+
+/* Produto modal */
+.produto-modal { max-width: 640px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.form-field { display: flex; flex-direction: column; gap: 6px; }
+.form-field.full { grid-column: 1 / -1; }
+.form-field label {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+  color: #555; text-transform: uppercase;
+}
+.form-field input,
+.form-field select,
+.form-field textarea {
+  background: #0f0f0f; border: 1px solid #2a2a2a; border-radius: 7px;
+  color: #f2f2f0; font-size: 13px; padding: 10px 12px;
+  outline: none; transition: border-color 0.2s;
+  font-family: 'Lato', sans-serif; resize: vertical;
+}
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus { border-color: #e8441a; }
+.form-field input::placeholder,
+.form-field textarea::placeholder { color: #444; }

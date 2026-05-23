@@ -1,0 +1,88 @@
+@if (produto) {
+<div class="detalhe-page">
+
+  <div class="breadcrumb">
+    <a routerLink="/produtos">Produtos</a>
+    <span class="breadcrumb-sep">/</span>
+    <span>{{ produto.nome }}</span>
+  </div>
+
+  <div class="detalhe-body">
+
+    <div class="col-imagem">
+      <div class="imagem-principal">
+        <img [src]="imagemAtual" [alt]="produto.nome" />
+      </div>
+      @if (produto.imagens && produto.imagens.length > 1) {
+        <div class="thumbs">
+          @for (img of produto.imagens; track img.id; let i = $index) {
+            <div
+              class="thumb"
+              [class.thumb--ativo]="imagemSelecionada === i"
+              (click)="imagemSelecionada = i"
+            >
+              <img [src]="img.url" [alt]="produto.nome" />
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="col-info">
+
+      <span class="produto-categoria">{{ produto.categoria }}</span>
+      <h1 class="produto-nome">{{ produto.nome }}</h1>
+
+      <div class="produto-precos">
+        <span class="preco-atual" [class.com-desconto]="temDesconto">
+          {{ precoFinal | currency:'BRL' }}
+        </span>
+        @if (temDesconto) {
+          <span class="preco-original">{{ produto.preco | currency:'BRL' }}</span>
+          <span class="desconto-badge">
+            -{{ (((produto.preco - precoFinal) / produto.preco) * 100) | number:'1.0-0' }}%
+          </span>
+        }
+      </div>
+
+      <p class="produto-descricao">{{ produto.descricao }}</p>
+
+      <div class="secao">
+        <span class="secao-titulo">Tamanho</span>
+        <div class="tamanhos">
+          @for (t of tamanhos; track t) {
+            <button
+              class="tamanho-btn"
+              [class.tamanho-btn--ativo]="tamanhoSelecionado === t"
+              (click)="selecionarTamanho(t)"
+            >
+              {{ t }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="secao">
+        <span class="secao-titulo">Quantidade</span>
+        <div class="quantidade-ctrl">
+          <button class="qtd-btn" (click)="diminuirQtd()">−</button>
+          <span class="qtd-valor">{{ quantidade }}</span>
+          <button class="qtd-btn" (click)="aumentarQtd()">+</button>
+        </div>
+      </div>
+
+      <div class="btns-acao">
+        <button class="btn-add-carrinho" (click)="adicionarAoCarrinho()">
+          {{ adicionado ? '✓ Adicionado!' : 'Adicionar ao carrinho' }}
+        </button>
+        <button class="btn-comprar" (click)="comprar()">
+          COMPRAR AGORA &rsaquo;
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+}

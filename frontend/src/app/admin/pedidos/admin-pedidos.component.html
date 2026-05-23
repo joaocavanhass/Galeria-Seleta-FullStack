@@ -1,0 +1,125 @@
+<div class="page-pedidos">
+  <div class="page-header">
+    <div>
+      <h1>Pedidos</h1>
+      <p>Acompanhe e gerencie todos os pedidos da loja</p>
+    </div>
+    <div class="filter-group">
+      <button *ngFor="let s of ['todos', 'pendente', 'pago', 'enviado', 'entregue', 'cancelado']"
+        class="filter-pill"
+        [class.active]="filtroStatus() === s"
+        (click)="filtroStatus.set(s)">
+        {{ s === 'todos' ? 'Todos' : getStatusLabel(s) }}
+      </button>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Pedido</th>
+            <th>Cliente</th>
+            <th>Data</th>
+            <th>Pagamento</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of filtrados()">
+            <td class="id-cell">#{{ p.id }}</td>
+            <td>
+              <div class="user-cell">
+                <div class="avatar">{{ p.usuario_nome.charAt(0) }}</div>
+                <div>
+                  <div style="font-size:13px;color:#f2f2f0">{{ p.usuario_nome }}</div>
+                  <div class="email-cell">{{ p.usuario_email }}</div>
+                </div>
+              </div>
+            </td>
+            <td class="date-cell">{{ p.criado_em }}</td>
+            <td class="email-cell">{{ getPagamentoLabel(p.forma_pagamento) }}</td>
+            <td style="font-weight:600;color:#f2f2f0">{{ formatCurrency(p.total) }}</td>
+            <td><span class="status-badge" [ngClass]="getStatusClass(p.status)">{{ getStatusLabel(p.status) }}</span></td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-icon info" (click)="verDetalhe(p)" title="Ver detalhes">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="filtrados().length === 0">
+            <td colspan="7" class="empty-row">Nenhum pedido encontrado.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETALHE -->
+<div class="modal-overlay" *ngIf="pedidoDetalhe()" (click)="fecharDetalhe()">
+  <div class="modal detalhe-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Pedido #{{ pedidoDetalhe()?.id }}</h3>
+      <button class="modal-close" (click)="fecharDetalhe()">×</button>
+    </div>
+    <div class="modal-body" *ngIf="pedidoDetalhe() as p">
+      <!-- Status atual -->
+      <div class="detalhe-status-row">
+        <span class="status-badge" [ngClass]="getStatusClass(p.status)">{{ getStatusLabel(p.status) }}</span>
+        <span class="date-cell">{{ p.criado_em }}</span>
+      </div>
+
+      <!-- Atualizar status -->
+      <div class="status-update">
+        <label>Atualizar Status:</label>
+        <div class="status-pills">
+          <button *ngFor="let s of statusOptions"
+            class="status-pill"
+            [class.active]="p.status === s"
+            [ngClass]="getStatusClass(s)"
+            (click)="atualizarStatus(p, s)">
+            {{ getStatusLabel(s) }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Info do cliente -->
+      <div class="detalhe-section">
+        <div class="section-title">Cliente</div>
+        <div class="detail-grid">
+          <div class="detail-item"><span class="detail-label">Nome</span><span>{{ p.usuario_nome }}</span></div>
+          <div class="detail-item"><span class="detail-label">E-mail</span><span>{{ p.usuario_email }}</span></div>
+          <div class="detail-item"><span class="detail-label">Pagamento</span><span>{{ getPagamentoLabel(p.forma_pagamento) }}</span></div>
+          <div class="detail-item full"><span class="detail-label">Endereço de Entrega</span><span>{{ p.endereco_entrega }}</span></div>
+        </div>
+      </div>
+
+      <!-- Itens -->
+      <div class="detalhe-section">
+        <div class="section-title">Itens do Pedido</div>
+        <div class="itens-list">
+          <div class="item-row" *ngFor="let item of p.itens">
+            <div class="item-info">
+              <div class="item-nome">{{ item.produto_nome }}</div>
+              <div class="item-qty">{{ item.quantidade }}x {{ formatCurrency(item.preco_unitario) }}</div>
+            </div>
+            <div class="item-total">{{ formatCurrency(item.subtotal) }}</div>
+          </div>
+          <div class="total-row">
+            <span>Total do Pedido</span>
+            <span>{{ formatCurrency(p.total) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

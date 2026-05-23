@@ -1,0 +1,502 @@
+/* ════════════════════════════════════════════════════════════
+   VARIÁVEIS — Urban Dark (idêntico ao resto do projeto)
+════════════════════════════════════════════════════════════ */
+:host {
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'Lato', Arial, sans-serif;
+
+  --cor-fundo:        #0f0f0f;
+  --cor-superficie:   #1e1e1e;
+  --cor-superficie-2: #3a3a3a;
+  --cor-texto:        #f2f2f0;
+  --cor-texto-muted:  #9a9895;
+  --cor-acento:       #e8441a;
+  --cor-separador:    #e8441a;
+  --cor-erro:         #c0392b;
+  --cor-sucesso:      #27ae60;
+
+  display: block;
+  background: var(--cor-fundo);
+}
+
+.esqueci {
+  font-family: var(--font-body);
+  color: var(--cor-texto);
+  background: var(--cor-fundo);
+  min-height: 100vh;
+}
+
+/* ════════════════════════════════════════════════════════════
+   HERO — mesma estrutura de home / cadastro / login
+════════════════════════════════════════════════════════════ */
+.esqueci-hero {
+  display: flex;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px 56px;
+}
+
+/* ── Card do formulário (esquerda, 56%) ── */
+.esqueci-form-wrapper {
+  flex: 0 0 56%;
+  background: var(--cor-superficie);
+  border-radius: 12px;
+  padding: 48px 52px 40px;
+  border-top: 2px solid var(--cor-separador);
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* ════════════════════════════════════════════════════════════
+   ETAPAS — transição suave entre elas
+════════════════════════════════════════════════════════════ */
+.etapa {
+  animation: fadeIn 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.etapa--sucesso {
+  align-items: flex-start;
+}
+
+/* ── Cabeçalho ── */
+.form-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-rotulo {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: var(--cor-acento);
+  margin: 0;
+}
+
+.form-titulo {
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  font-weight: 300;
+  color: var(--cor-texto);
+  margin: 0;
+  line-height: 1.1;
+}
+
+.form-titulo em {
+  font-style: italic;
+  color: var(--cor-texto-muted);
+}
+
+.form-descricao {
+  font-size: 0.82rem;
+  color: var(--cor-texto-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.form-descricao strong {
+  color: var(--cor-texto);
+  font-weight: 600;
+}
+
+/* ── Formulário ── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* ════════════════════════════════════════════════════════════
+   CAMPOS — idênticos ao cadastro e login
+════════════════════════════════════════════════════════════ */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.campo__label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--cor-texto-muted);
+  transition: color 0.2s;
+}
+
+.campo:focus-within .campo__label { color: var(--cor-acento); }
+
+.campo__input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--cor-superficie-2);
+  padding: 8px 0;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--cor-texto);
+  outline: none;
+  width: 100%;
+  transition: border-color 0.25s;
+  caret-color: var(--cor-acento);
+}
+
+.campo__input::placeholder {
+  color: var(--cor-superficie-2);
+  font-style: italic;
+}
+
+.campo__input:focus { border-bottom-color: var(--cor-acento); }
+
+.campo--erro .campo__input { border-bottom-color: var(--cor-erro); }
+.campo--erro .campo__label { color: var(--cor-erro); }
+
+.campo__msg-erro {
+  font-size: 0.68rem;
+  color: var(--cor-erro);
+  letter-spacing: 0.04em;
+  animation: fadeIn 0.2s ease;
+}
+
+/* ── Senha com olho ── */
+.campo__senha-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.campo__senha-wrap .campo__input { padding-right: 32px; }
+
+.btn-olho {
+  position: absolute;
+  right: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--cor-texto-muted);
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.btn-olho:hover { color: var(--cor-acento); }
+
+/* ── Barra de força da senha ── */
+.forca-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.forca-barras { display: flex; gap: 4px; }
+
+.forca-traco {
+  display: block;
+  width: 36px;
+  height: 2px;
+  background: var(--cor-superficie-2);
+  border-radius: 2px;
+  transition: background 0.3s;
+}
+
+.forca-traco.fraca { background: var(--cor-erro); }
+.forca-traco.media { background: #e67e22; }
+.forca-traco.forte { background: var(--cor-sucesso); }
+
+.forca-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: var(--cor-texto-muted);
+}
+
+/* ════════════════════════════════════════════════════════════
+   CÓDIGO DE VERIFICAÇÃO — 6 dígitos
+════════════════════════════════════════════════════════════ */
+.codigo-wrap {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+}
+
+.codigo-digito {
+  width: 48px;
+  height: 56px;
+  background: transparent;
+  border: 1px solid var(--cor-superficie-2);
+  border-radius: 4px;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: var(--cor-texto);
+  outline: none;
+  caret-color: var(--cor-acento);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.codigo-digito:focus {
+  border-color: var(--cor-acento);
+  background: rgba(232,68,26,0.04);
+}
+
+.codigo-digito--preenchido {
+  border-color: var(--cor-superficie-2);
+  color: var(--cor-acento);
+}
+
+/* Reenviar código */
+.reenviar {
+  font-size: 0.78rem;
+  color: var(--cor-texto-muted);
+  margin: 0;
+}
+
+.btn-reenviar {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--cor-acento);
+  padding: 0;
+  margin-left: 4px;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s, opacity 0.2s;
+}
+
+.btn-reenviar:hover:not(:disabled) { border-bottom-color: var(--cor-acento); }
+.btn-reenviar:disabled { color: var(--cor-texto-muted); cursor: default; }
+
+/* ════════════════════════════════════════════════════════════
+   ALERTAS
+════════════════════════════════════════════════════════════ */
+.alerta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  border-left: 2px solid;
+  animation: fadeIn 0.25s ease;
+}
+
+.alerta--erro { background: rgba(192,57,43,0.08); border-color: var(--cor-erro); color: var(--cor-erro); }
+
+/* ════════════════════════════════════════════════════════════
+   BOTÕES — idênticos ao padrão do projeto
+════════════════════════════════════════════════════════════ */
+.btn-principal {
+  width: 100%;
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1.5px solid var(--cor-acento);
+  color: var(--cor-acento);
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s, opacity 0.25s;
+  text-decoration: none;
+}
+
+.btn-principal:hover:not(:disabled) {
+  background: var(--cor-acento);
+  color: var(--cor-fundo);
+}
+
+.btn-principal:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-principal--link { display: flex; }
+
+/* Botão voltar — texto discreto com seta */
+.btn-voltar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--cor-texto-muted);
+  padding: 0;
+  text-decoration: none;
+  letter-spacing: 0.06em;
+  width: fit-content;
+  transition: color 0.2s;
+}
+
+.btn-voltar:hover { color: var(--cor-texto); }
+
+/* Spinner */
+.spinner {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(232,68,26,0.3);
+  border-top-color: var(--cor-acento);
+  border-radius: 50%;
+  animation: girar 0.7s linear infinite;
+}
+
+/* ════════════════════════════════════════════════════════════
+   ETAPA SUCESSO
+════════════════════════════════════════════════════════════ */
+.sucesso-icone {
+  width: 64px;
+  height: 64px;
+  border: 1.5px solid var(--cor-sucesso);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cor-sucesso);
+  animation: escalar 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes escalar {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* ════════════════════════════════════════════════════════════
+   INDICADOR DE PROGRESSO
+════════════════════════════════════════════════════════════ */
+.progresso {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-top: 32px;
+}
+
+.progresso__passo {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cor-superficie-2);
+  flex-shrink: 0;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.progresso__passo.ativo    { background: var(--cor-acento); transform: scale(1.2); }
+.progresso__passo.concluido { background: var(--cor-superficie-2); transform: scale(1); }
+.progresso__passo.concluido::after {
+  content: '';
+}
+
+.progresso__linha {
+  flex: 1;
+  height: 1px;
+  background: var(--cor-superficie-2);
+  transition: background 0.4s;
+}
+
+.progresso__linha.ativo { background: var(--cor-acento); }
+
+/* ════════════════════════════════════════════════════════════
+   TEXTO EDITORIAL (direita)
+════════════════════════════════════════════════════════════ */
+.esqueci-texto {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  padding-left: 32px;
+}
+
+.esqueci-titulo {
+  font-family: var(--font-display);
+  font-weight: 300;
+  line-height: 1.0;
+  color: var(--cor-texto);
+  margin: 0 0 18px;
+}
+
+.titulo-linha {
+  display: block;
+  font-size: clamp(3.5rem, 7vw, 5.6rem);
+  letter-spacing: -0.01em;
+}
+
+.titulo-italico { font-style: italic; }
+
+.esqueci-subtitulo {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: var(--cor-texto-muted);
+  line-height: 1.6;
+}
+
+.esqueci-subtitulo em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--cor-texto);
+}
+
+/* ════════════════════════════════════════════════════════════
+   FAIXA SEPARADORA
+════════════════════════════════════════════════════════════ */
+.separador-faixa {
+  text-align: center;
+  border-top: 2px solid var(--cor-separador);
+  padding: 24px 0;
+}
+
+.separador-texto {
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: 0.35em;
+  color: var(--cor-texto-muted);
+}
+
+/* ════════════════════════════════════════════════════════════
+   ANIMAÇÕES
+════════════════════════════════════════════════════════════ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes girar {
+  to { transform: rotate(360deg); }
+}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVO
+════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .esqueci-hero {
+    flex-direction: column-reverse;
+    padding: 24px 16px 40px;
+    gap: 32px;
+  }
+
+  .esqueci-form-wrapper {
+    flex: unset;
+    width: 100%;
+    padding: 28px 20px 24px;
+  }
+
+  .esqueci-texto {
+    align-items: center;
+    text-align: center;
+    padding-left: 0;
+  }
+
+  .codigo-digito { width: 40px; height: 48px; font-size: 1.4rem; }
+}

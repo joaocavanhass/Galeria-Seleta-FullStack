@@ -1,0 +1,142 @@
+<div class="page-usuarios">
+  <div class="page-header">
+    <div>
+      <h1>Usuários</h1>
+      <p>Gerencie os usuários cadastrados na plataforma</p>
+    </div>
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" placeholder="Buscar por nome ou e-mail..." [ngModel]="busca()" (ngModelChange)="busca.set($event)" />
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>E-mail</th>
+            <th>Papel</th>
+            <th>Status</th>
+            <th>Cadastro</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of filtrados()">
+            <td class="id-cell">#{{ u.id }}</td>
+            <td>
+              <div class="user-cell">
+                <div class="avatar">{{ u.nome.charAt(0) }}</div>
+                <span>{{ u.nome }}</span>
+              </div>
+            </td>
+            <td class="email-cell">{{ u.email }}</td>
+            <td>
+              <span class="role-badge" [class.admin]="u.papel === 'admin'">
+                {{ u.papel === 'admin' ? '@admin' : 'Cliente' }}
+              </span>
+            </td>
+            <td>
+              <span class="status-dot" [class.ativo]="u.status === 'ativo'" [class.bloqueado]="u.status === 'bloqueado'">
+                {{ u.status === 'ativo' ? 'Ativo' : 'Bloqueado' }}
+              </span>
+            </td>
+            <td class="date-cell">{{ u.criado_em }}</td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-icon info" (click)="verDetalhes(u)" title="Ver detalhes">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                </button>
+                <button *ngIf="u.status === 'ativo' && u.papel !== 'admin'"
+                  class="btn-icon warn" (click)="confirmar('bloquear', u)" title="Bloquear">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+                  </svg>
+                </button>
+                <button *ngIf="u.status === 'bloqueado'"
+                  class="btn-icon success" (click)="confirmar('desbloquear', u)" title="Desbloquear">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </button>
+                <button *ngIf="u.papel === 'cliente'"
+                  class="btn-icon accent" (click)="confirmar('promover', u)" title="Tornar admin">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <polyline points="17 11 12 6 7 11"/><line x1="12" y1="18" x2="12" y2="6"/>
+                  </svg>
+                </button>
+                <button *ngIf="u.papel === 'admin' && u.id !== 6"
+                  class="btn-icon muted" (click)="confirmar('rebaixar', u)" title="Remover admin">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <polyline points="17 13 12 18 7 13"/><line x1="12" y1="6" x2="12" y2="18"/>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="filtrados().length === 0">
+            <td colspan="7" class="empty-row">Nenhum usuário encontrado.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETALHES -->
+<div class="modal-overlay" *ngIf="usuarioSelecionado()" (click)="fecharModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Detalhes do Usuário</h3>
+      <button class="modal-close" (click)="fecharModal()">×</button>
+    </div>
+    <div class="modal-body" *ngIf="usuarioSelecionado() as u">
+      <div class="user-profile">
+        <div class="profile-avatar">{{ u.nome.charAt(0) }}</div>
+        <div>
+          <div class="profile-name">{{ u.nome }}</div>
+          <div class="profile-meta">
+            <span class="role-badge" [class.admin]="u.papel === 'admin'">{{ u.papel === 'admin' ? '@admin' : 'Cliente' }}</span>
+            <span class="status-dot" [class.ativo]="u.status === 'ativo'" [class.bloqueado]="u.status === 'bloqueado'">{{ u.status }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-item"><span class="detail-label">E-mail</span><span>{{ u.email }}</span></div>
+        <div class="detail-item" *ngIf="u.telefone"><span class="detail-label">Telefone</span><span>{{ u.telefone }}</span></div>
+        <div class="detail-item"><span class="detail-label">Cadastro</span><span>{{ u.criado_em }}</span></div>
+        <div class="detail-item"><span class="detail-label">Pedidos</span><span>{{ u.total_pedidos }}</span></div>
+        <div class="detail-item"><span class="detail-label">Total Gasto</span><span>{{ formatCurrency(u.total_gasto || 0) }}</span></div>
+      </div>
+      <div class="modal-actions">
+        <button *ngIf="u.status === 'ativo' && u.papel !== 'admin'" class="btn-secondary" (click)="confirmar('bloquear', u)">Bloquear</button>
+        <button *ngIf="u.status === 'bloqueado'" class="btn-success" (click)="confirmar('desbloquear', u)">Desbloquear</button>
+        <button *ngIf="u.papel === 'cliente'" class="btn-accent" (click)="confirmar('promover', u)">Tornar Admin</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAÇÃO -->
+<div class="modal-overlay" *ngIf="confirmacao()" (click)="cancelarConfirmacao()">
+  <div class="modal confirm-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header"><h3>Confirmar ação</h3></div>
+    <div class="modal-body">
+      <p *ngIf="confirmacao() as c">
+        Deseja <strong>{{ c.acao }}</strong> o usuário <strong>{{ c.usuario.nome }}</strong>?
+      </p>
+      <div class="confirm-actions">
+        <button class="btn-secondary" (click)="cancelarConfirmacao()">Cancelar</button>
+        <button class="btn-primary" (click)="executarAcao()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>

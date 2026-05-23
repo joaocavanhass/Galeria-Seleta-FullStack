@@ -1,0 +1,264 @@
+<link rel="stylesheet" href="./esqueci-senha.component.css" />
+
+<div class="esqueci">
+
+  <!-- ══════════════════════════════════════════════
+       HERO
+  ══════════════════════════════════════════════ -->
+  <section class="esqueci-hero">
+
+    <!-- Formulário (esquerda, 56%) -->
+    <div class="esqueci-form-wrapper">
+
+      <!-- ── ETAPA 1: Informe o e-mail ── -->
+      <div class="etapa" *ngIf="etapa === 1">
+
+        <header class="form-header">
+          <p class="form-rotulo">RECUPERAR ACESSO</p>
+          <h2 class="form-titulo">Esqueceu<br><em>a senha?</em></h2>
+          <p class="form-descricao">
+            Informe o e-mail da sua conta e enviaremos um código de verificação.
+          </p>
+        </header>
+
+        <form class="form" (ngSubmit)="enviarCodigo()" novalidate>
+
+          <div class="campo" [class.campo--erro]="emailTocado && !emailValido">
+            <label class="campo__label">E-mail</label>
+            <input
+              type="email"
+              class="campo__input"
+              placeholder="seu@email.com"
+              [(ngModel)]="email"
+              name="email"
+              required
+              (blur)="emailTocado = true"
+            />
+            <span class="campo__msg-erro" *ngIf="emailTocado && !emailValido">
+              Insira um e-mail válido
+            </span>
+          </div>
+
+          <div class="alerta alerta--erro" *ngIf="mensagemErro">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            {{ mensagemErro }}
+          </div>
+
+          <button type="submit" class="btn-principal" [disabled]="carregando">
+            <span *ngIf="!carregando">ENVIAR CÓDIGO</span>
+            <span *ngIf="carregando" class="spinner"></span>
+          </button>
+
+          <a routerLink="/login" class="btn-voltar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+            </svg>
+            Voltar ao login
+          </a>
+
+        </form>
+      </div>
+
+      <!-- ── ETAPA 2: Código de verificação ── -->
+      <div class="etapa" *ngIf="etapa === 2">
+
+        <header class="form-header">
+          <p class="form-rotulo">VERIFICAÇÃO</p>
+          <h2 class="form-titulo">Cheque<br><em>seu e-mail</em></h2>
+          <p class="form-descricao">
+            Enviamos um código de 6 dígitos para
+            <strong>{{ email }}</strong>. Insira-o abaixo.
+          </p>
+        </header>
+
+        <form class="form" (ngSubmit)="verificarCodigo()" novalidate>
+
+          <!-- Inputs de código -->
+          <div class="codigo-wrap">
+            <input
+              *ngFor="let i of [0,1,2,3,4,5]"
+              type="text"
+              inputmode="numeric"
+              maxlength="1"
+              class="codigo-digito"
+              [class.codigo-digito--preenchido]="codigo[i]"
+              [(ngModel)]="codigo[i]"
+              [name]="'d' + i"
+              (input)="aoDigitar($event, i)"
+              (keydown)="aoApagar($event, i)"
+              (paste)="aoColar($event)"
+              #digitoRef
+            />
+          </div>
+
+          <p class="reenviar">
+            Não recebeu?
+            <button type="button" class="btn-reenviar"
+              (click)="reenviarCodigo()"
+              [disabled]="contagemReenvio > 0">
+              {{ contagemReenvio > 0 ? 'Reenviar em ' + contagemReenvio + 's' : 'Reenviar código' }}
+            </button>
+          </p>
+
+          <div class="alerta alerta--erro" *ngIf="mensagemErro">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            {{ mensagemErro }}
+          </div>
+
+          <button type="submit" class="btn-principal" [disabled]="carregando || codigoIncompleto">
+            <span *ngIf="!carregando">VERIFICAR</span>
+            <span *ngIf="carregando" class="spinner"></span>
+          </button>
+
+          <button type="button" class="btn-voltar" (click)="etapa = 1; mensagemErro = ''">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+            </svg>
+            Alterar e-mail
+          </button>
+
+        </form>
+      </div>
+
+      <!-- ── ETAPA 3: Nova senha ── -->
+      <div class="etapa" *ngIf="etapa === 3">
+
+        <header class="form-header">
+          <p class="form-rotulo">NOVA SENHA</p>
+          <h2 class="form-titulo">Redefina<br><em>sua senha</em></h2>
+          <p class="form-descricao">
+            Escolha uma senha segura para proteger sua conta.
+          </p>
+        </header>
+
+        <form class="form" (ngSubmit)="redefinirSenha()" novalidate>
+
+          <!-- Nova senha -->
+          <div class="campo" [class.campo--erro]="senhaTocada && !senhaValida">
+            <label class="campo__label">Nova senha</label>
+            <div class="campo__senha-wrap">
+              <input
+                [type]="mostrarSenha ? 'text' : 'password'"
+                class="campo__input"
+                placeholder="Mínimo 8 caracteres"
+                [(ngModel)]="novaSenha"
+                name="novaSenha"
+                required
+                (blur)="senhaTocada = true"
+              />
+              <button type="button" class="btn-olho" (click)="mostrarSenha = !mostrarSenha">
+                <svg *ngIf="!mostrarSenha" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                </svg>
+                <svg *ngIf="mostrarSenha" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+                  <line x1="1" y1="1" x2="23" y2="23"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Barra de força -->
+            <div class="forca-wrap" *ngIf="novaSenha.length > 0">
+              <div class="forca-barras">
+                <span class="forca-traco" [class.fraca]="forcaSenha === 1" [class.media]="forcaSenha === 2" [class.forte]="forcaSenha >= 3"></span>
+                <span class="forca-traco" [class.media]="forcaSenha === 2" [class.forte]="forcaSenha >= 3"></span>
+                <span class="forca-traco" [class.forte]="forcaSenha >= 3"></span>
+              </div>
+              <span class="forca-label">{{ labelForca }}</span>
+            </div>
+
+            <span class="campo__msg-erro" *ngIf="senhaTocada && !senhaValida">Mínimo 8 caracteres</span>
+          </div>
+
+          <!-- Confirmar senha -->
+          <div class="campo" [class.campo--erro]="confirmarTocada && !senhasIguais">
+            <label class="campo__label">Confirmar nova senha</label>
+            <div class="campo__senha-wrap">
+              <input
+                [type]="mostrarConfirmar ? 'text' : 'password'"
+                class="campo__input"
+                placeholder="Repita a senha"
+                [(ngModel)]="confirmarSenha"
+                name="confirmarSenha"
+                required
+                (blur)="confirmarTocada = true"
+              />
+              <button type="button" class="btn-olho" (click)="mostrarConfirmar = !mostrarConfirmar">
+                <svg *ngIf="!mostrarConfirmar" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                </svg>
+                <svg *ngIf="mostrarConfirmar" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+                  <line x1="1" y1="1" x2="23" y2="23"/>
+                </svg>
+              </button>
+            </div>
+            <span class="campo__msg-erro" *ngIf="confirmarTocada && !senhasIguais">As senhas não conferem</span>
+          </div>
+
+          <div class="alerta alerta--erro" *ngIf="mensagemErro">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            {{ mensagemErro }}
+          </div>
+
+          <button type="submit" class="btn-principal" [disabled]="carregando">
+            <span *ngIf="!carregando">SALVAR NOVA SENHA</span>
+            <span *ngIf="carregando" class="spinner"></span>
+          </button>
+
+        </form>
+      </div>
+
+      <!-- ── ETAPA 4: Sucesso ── -->
+      <div class="etapa etapa--sucesso" *ngIf="etapa === 4">
+        <div class="sucesso-icone">
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <p class="form-rotulo">TUDO CERTO</p>
+        <h2 class="form-titulo">Senha<br><em>redefinida!</em></h2>
+        <p class="form-descricao">
+          Sua senha foi atualizada com sucesso. Você já pode acessar sua conta.
+        </p>
+        <a routerLink="/login" class="btn-principal btn-principal--link">IR PARA O LOGIN</a>
+      </div>
+
+      <!-- Indicador de progresso -->
+      <div class="progresso" *ngIf="etapa < 4">
+        <span class="progresso__passo" [class.ativo]="etapa >= 1" [class.concluido]="etapa > 1"></span>
+        <span class="progresso__linha" [class.ativo]="etapa > 1"></span>
+        <span class="progresso__passo" [class.ativo]="etapa >= 2" [class.concluido]="etapa > 2"></span>
+        <span class="progresso__linha" [class.ativo]="etapa > 2"></span>
+        <span class="progresso__passo" [class.ativo]="etapa >= 3"></span>
+      </div>
+
+    </div>
+
+    <!-- Texto editorial (direita) -->
+    <div class="esqueci-texto">
+      <h1 class="esqueci-titulo">
+        <span class="titulo-linha">Acontece</span>
+        <span class="titulo-linha">com os</span>
+        <span class="titulo-linha titulo-italico">melhores</span>
+      </h1>
+      <p class="esqueci-subtitulo">
+        Recupere seu acesso<br>
+        e volte a explorar <em>peças únicas</em>
+      </p>
+    </div>
+
+  </section>
+
+  <!-- Faixa separadora -->
+  <div class="separador-faixa">
+    <span class="separador-texto">GALERIA SELETA — PEÇAS ÚNICAS</span>
+  </div>
+
+</div>
