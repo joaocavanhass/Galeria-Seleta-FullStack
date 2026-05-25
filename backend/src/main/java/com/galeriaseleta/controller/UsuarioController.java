@@ -5,9 +5,11 @@ import com.galeriaseleta.dto.request.AtualizarPerfilRequest;
 import com.galeriaseleta.dto.request.EnderecoRequest;
 import com.galeriaseleta.dto.response.EnderecoResponse;
 import com.galeriaseleta.dto.response.UsuarioResponse;
+import com.galeriaseleta.security.UsuarioDetails;
 import com.galeriaseleta.service.UsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,49 +24,48 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
-    /** Retorna o perfil do usuário autenticado. O ID será extraído do contexto de autenticação. */
     @GetMapping("/me")
-    public ResponseEntity<UsuarioResponse> obterPerfil() {
-        return ResponseEntity.ok(UsuarioResponse.from(usuarioService.buscarPorId(1L)));
+    public ResponseEntity<UsuarioResponse> obterPerfil(@AuthenticationPrincipal UsuarioDetails ud) {
+        return ResponseEntity.ok(UsuarioResponse.from(usuarioService.buscarPorId((long) ud.getUsuario().getId())));
     }
 
-    /** Atualiza nome e telefone do usuário autenticado. */
     @PutMapping("/me")
-    public ResponseEntity<UsuarioResponse> atualizarPerfil(@RequestBody AtualizarPerfilRequest request) {
-        return ResponseEntity.ok(UsuarioResponse.from(usuarioService.atualizar(1L, request)));
+    public ResponseEntity<UsuarioResponse> atualizarPerfil(
+            @AuthenticationPrincipal UsuarioDetails ud,
+            @RequestBody AtualizarPerfilRequest request) {
+        return ResponseEntity.ok(UsuarioResponse.from(usuarioService.atualizar((long) ud.getUsuario().getId(), request)));
     }
 
-    /** Altera a senha do usuário autenticado. */
     @PatchMapping("/me/senha")
-    public ResponseEntity<Void> alterarSenha(@RequestBody AlterarSenhaRequest request) {
-        usuarioService.alterarSenha(1L, request);
+    public ResponseEntity<Void> alterarSenha(
+            @AuthenticationPrincipal UsuarioDetails ud,
+            @RequestBody AlterarSenhaRequest request) {
+        usuarioService.alterarSenha((long) ud.getUsuario().getId(), request);
         return ResponseEntity.ok().build();
     }
 
-    /** Remove a conta do usuário autenticado. */
     @DeleteMapping("/me")
-    public ResponseEntity<Void> deletarConta() {
-        usuarioService.deletar(1L);
+    public ResponseEntity<Void> deletarConta(@AuthenticationPrincipal UsuarioDetails ud) {
+        usuarioService.deletar((long) ud.getUsuario().getId());
         return ResponseEntity.noContent().build();
     }
 
-    /** Lista os endereços de entrega do usuário autenticado. */
     @GetMapping("/me/enderecos")
-    public ResponseEntity<List<EnderecoResponse>> listarEnderecos() {
-        List<EnderecoResponse> enderecos = usuarioService.listarEnderecos(1L).stream()
+    public ResponseEntity<List<EnderecoResponse>> listarEnderecos(@AuthenticationPrincipal UsuarioDetails ud) {
+        List<EnderecoResponse> enderecos = usuarioService.listarEnderecos((long) ud.getUsuario().getId()).stream()
                 .map(EnderecoResponse::from)
                 .toList();
         return ResponseEntity.ok(enderecos);
     }
 
-    /** Adiciona um endereço de entrega ao perfil do usuário. */
     @PostMapping("/me/enderecos")
-    public ResponseEntity<EnderecoResponse> adicionarEndereco(@RequestBody EnderecoRequest request) {
+    public ResponseEntity<EnderecoResponse> adicionarEndereco(
+            @AuthenticationPrincipal UsuarioDetails ud,
+            @RequestBody EnderecoRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(EnderecoResponse.from(usuarioService.adicionarEndereco(1L, request)));
+                .body(EnderecoResponse.from(usuarioService.adicionarEndereco((long) ud.getUsuario().getId(), request)));
     }
 
-    /** Remove um endereço de entrega do perfil do usuário. */
     @DeleteMapping("/me/enderecos/{enderecoId}")
     public ResponseEntity<Void> removerEndereco(@PathVariable Long enderecoId) {
         usuarioService.removerEndereco(enderecoId);

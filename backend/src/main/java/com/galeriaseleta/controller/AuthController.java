@@ -4,11 +4,13 @@ import com.galeriaseleta.dto.request.AuthLoginRequest;
 import com.galeriaseleta.dto.request.AuthRegisterRequest;
 import com.galeriaseleta.dto.request.EsqueceuSenhaRequest;
 import com.galeriaseleta.dto.request.RedefinirSenhaRequest;
-import com.galeriaseleta.dto.response.UsuarioResponse;
+import com.galeriaseleta.dto.response.AuthResponse;
 import com.galeriaseleta.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -20,39 +22,39 @@ public class AuthController {
         this.authService = authService;
     }
 
-    /** Autentica o usuário com e-mail e senha. */
+    /** Autentica o usuário e retorna access + refresh token. */
     @PostMapping("/login")
-    public ResponseEntity<UsuarioResponse> login(@RequestBody AuthLoginRequest request) {
-        return ResponseEntity.ok(UsuarioResponse.from(authService.login(request.getEmail(), request.getSenha())));
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthLoginRequest request) {
+        return ResponseEntity.ok(authService.login(request.getEmail(), request.getSenha()));
     }
 
-    /** Registra um novo usuário. */
+    /** Registra novo usuário e já retorna os tokens (auto-login). */
     @PostMapping("/register")
-    public ResponseEntity<UsuarioResponse> registrar(@RequestBody AuthRegisterRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(UsuarioResponse.from(authService.registrar(request)));
+    public ResponseEntity<AuthResponse> registrar(@RequestBody AuthRegisterRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.registrar(request));
     }
 
-    /** Encerra a sessão do usuário. */
+    /** Encerra a sessão — JWT é stateless, o cliente descarta o token. */
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
         authService.logout();
         return ResponseEntity.noContent().build();
     }
 
-    /** Renova o token de acesso. Body: { refreshToken }. */
+    /** Renova o access token usando o refresh token. Body: { "refreshToken": "..." }. */
     @PostMapping("/refresh")
-    public ResponseEntity<Object> refreshToken(@RequestBody java.util.Map<String, String> body) {
+    public ResponseEntity<AuthResponse> refreshToken(@RequestBody Map<String, String> body) {
         return ResponseEntity.ok(authService.refreshToken(body.get("refreshToken")));
     }
 
-    /** Inicia o fluxo de recuperação de senha. */
+    /** Inicia o fluxo de recuperação de senha por e-mail. */
     @PostMapping("/forgot-password")
     public ResponseEntity<Void> esqueceuSenha(@RequestBody EsqueceuSenhaRequest request) {
         authService.esqueceuSenha(request.getEmail());
         return ResponseEntity.ok().build();
     }
 
-    /** Redefine a senha com o token de recuperação. */
+    /** Redefine a senha com o token de recuperação enviado por e-mail. */
     @PostMapping("/reset-password")
     public ResponseEntity<Void> redefinirSenha(@RequestBody RedefinirSenhaRequest request) {
         authService.redefinirSenha(request.getToken(), request.getNovaSenha());

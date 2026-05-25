@@ -17,11 +17,14 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final EnderecoRepository enderecoRepository;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository usuarioRepository, EnderecoRepository enderecoRepository) {
+    public UsuarioService(UsuarioRepository usuarioRepository,
+                          EnderecoRepository enderecoRepository,
+                          BCryptPasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.enderecoRepository = enderecoRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public Usuario buscarPorId(Long id) {
