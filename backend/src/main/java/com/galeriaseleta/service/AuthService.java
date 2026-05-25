@@ -10,6 +10,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Service
 public class AuthService {
 
@@ -17,6 +20,8 @@ public class AuthService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+
+    private final ConcurrentHashMap<String, String> tokenRecuperacao = new ConcurrentHashMap<>();
 
     public AuthService(UsuarioRepository usuarioRepository,
                        BCryptPasswordEncoder passwordEncoder,
@@ -73,14 +78,23 @@ public class AuthService {
         return new AuthResponse(newAccessToken, refreshToken, UsuarioResponse.from(usuario));
     }
 
-    public void esqueceuSenha(String email) {
+    public String esqueceuSenha(String email) {
         usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("E-mail não encontrado"));
-        // TODO: enviar e-mail com link de recuperação
+        String token = UUID.randomUUID().toString();
+        tokenRecuperacao.put(token, email);
+        return token;
     }
 
     public void redefinirSenha(String token, String novaSenha) {
-        throw new UnsupportedOperationException("Redefinição de senha por e-mail não implementada");
+        String email = tokenRecuperacao.remove(token);
+        if (email == null) {
+            throw new RuntimeException("Token inválido ou já utilizado");
+        }
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        usuario.setSenha(passwordEncoder.encode(novaSenha));
+        usuarioRepository.save(usuario);
     }
 
     private AuthResponse buildAuthResponse(Usuario usuario) {

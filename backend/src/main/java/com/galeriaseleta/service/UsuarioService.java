@@ -3,10 +3,14 @@ package com.galeriaseleta.service;
 import com.galeriaseleta.dto.request.AlterarSenhaRequest;
 import com.galeriaseleta.dto.request.AtualizarPerfilRequest;
 import com.galeriaseleta.dto.request.EnderecoRequest;
+import com.galeriaseleta.dto.response.PageResponse;
+import com.galeriaseleta.dto.response.UsuarioResponse;
 import com.galeriaseleta.model.Endereco;
 import com.galeriaseleta.model.Usuario;
 import com.galeriaseleta.repository.EnderecoRepository;
 import com.galeriaseleta.repository.UsuarioRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +35,12 @@ public class UsuarioService {
         return usuarioRepository.findAll();
     }
 
+    public PageResponse<UsuarioResponse> listarPaginado(int page, int size) {
+        return PageResponse.from(
+                usuarioRepository.findAll(PageRequest.of(page, size, Sort.by("id"))),
+                UsuarioResponse::from);
+    }
+
     public Usuario atualizarPapel(Long id, String papel) {
         Usuario usuario = buscarPorId(id);
         usuario.setPapel(papel);
@@ -50,8 +60,9 @@ public class UsuarioService {
     public Usuario atualizar(Long id, AtualizarPerfilRequest request) {
         Usuario usuario = buscarPorId(id);
 
-        if (request.getNome() != null) usuario.setNome(request.getNome());
+        if (request.getNome() != null)     usuario.setNome(request.getNome());
         if (request.getTelefone() != null) usuario.setTelefone(request.getTelefone());
+        if (request.getCpf() != null)      usuario.setCpf(request.getCpf());
 
         return usuarioRepository.save(usuario);
     }

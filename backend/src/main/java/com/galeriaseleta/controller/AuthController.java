@@ -47,11 +47,11 @@ public class AuthController {
         return ResponseEntity.ok(authService.refreshToken(body.get("refreshToken")));
     }
 
-    /** Inicia o fluxo de recuperação de senha por e-mail. */
+    /** Gera token de recuperação de senha. Retorna o token no corpo (sem e-mail real). */
     @PostMapping("/forgot-password")
-    public ResponseEntity<Void> esqueceuSenha(@RequestBody EsqueceuSenhaRequest request) {
-        authService.esqueceuSenha(request.getEmail());
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Map<String, String>> esqueceuSenha(@RequestBody EsqueceuSenhaRequest request) {
+        String token = authService.esqueceuSenha(request.getEmail());
+        return ResponseEntity.ok(Map.of("token", token));
     }
 
     /** Redefine a senha com o token de recuperação enviado por e-mail. */

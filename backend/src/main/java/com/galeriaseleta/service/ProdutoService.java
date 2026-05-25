@@ -1,11 +1,15 @@
 package com.galeriaseleta.service;
 
 import com.galeriaseleta.dto.request.ProdutoRequest;
+import com.galeriaseleta.dto.response.PageResponse;
+import com.galeriaseleta.dto.response.ProdutoResponse;
 import com.galeriaseleta.model.FotoProduto;
 import com.galeriaseleta.model.Produto;
 import com.galeriaseleta.repository.CategoriaRepository;
 import com.galeriaseleta.repository.FotoProdutoRepository;
 import com.galeriaseleta.repository.ProdutoRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,6 +30,15 @@ public class ProdutoService {
 
     public List<Produto> listarTodos() {
         return produtoRepository.findAll();
+    }
+
+    public PageResponse<ProdutoResponse> listarPaginado(String status, Long categoriaId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        if (categoriaId != null) {
+            return PageResponse.from(produtoRepository.findByCategoriaId(categoriaId.intValue(), pageable), ProdutoResponse::from);
+        }
+        String filtroStatus = (status == null || status.isBlank()) ? "disponivel" : status;
+        return PageResponse.from(produtoRepository.findByStatus(filtroStatus, pageable), ProdutoResponse::from);
     }
 
     public List<Produto> listarAtivos() {

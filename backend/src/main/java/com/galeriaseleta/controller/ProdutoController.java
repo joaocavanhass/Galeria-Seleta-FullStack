@@ -3,6 +3,7 @@ package com.galeriaseleta.controller;
 import com.galeriaseleta.dto.request.AtualizarStatusRequest;
 import com.galeriaseleta.dto.request.ProdutoRequest;
 import com.galeriaseleta.dto.response.FotoProdutoResponse;
+import com.galeriaseleta.dto.response.PageResponse;
 import com.galeriaseleta.dto.response.ProdutoResponse;
 import com.galeriaseleta.service.ProdutoService;
 import org.springframework.http.HttpStatus;
@@ -21,15 +22,23 @@ public class ProdutoController {
         this.produtoService = produtoService;
     }
 
-    /** Lista produtos com filtros opcionais. Roteia para o método de serviço adequado com base nos parâmetros. */
+    /** Lista produtos com filtros e paginação opcionais. Sem page/size retorna lista simples (ordenação especial). */
     @GetMapping
-    public ResponseEntity<List<ProdutoResponse>> listarProdutos(
+    public ResponseEntity<?> listarProdutos(
             @RequestParam(required = false) Long categoriaId,
             @RequestParam(required = false, defaultValue = "padrao") String ordenacao,
-            @RequestParam(required = false, defaultValue = "ativo") String status) {
+            @RequestParam(required = false, defaultValue = "ativo") String status,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+
+        if (page != null) {
+            int pageSize = (size != null) ? size : 20;
+            String filtroStatus = "todos".equals(status) ? null : status;
+            PageResponse<ProdutoResponse> resultado = produtoService.listarPaginado(filtroStatus, categoriaId, page, pageSize);
+            return ResponseEntity.ok(resultado);
+        }
 
         List<ProdutoResponse> resultado;
-
         if (categoriaId != null) {
             resultado = produtoService.buscarPorCategoria(categoriaId).stream()
                     .map(ProdutoResponse::from).toList();
@@ -43,7 +52,6 @@ public class ProdutoController {
                         : produtoService.listarAtivos().stream().map(ProdutoResponse::from).toList();
             };
         }
-
         return ResponseEntity.ok(resultado);
     }
 

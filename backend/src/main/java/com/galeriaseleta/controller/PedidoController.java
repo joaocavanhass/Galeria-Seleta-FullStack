@@ -2,6 +2,7 @@ package com.galeriaseleta.controller;
 
 import com.galeriaseleta.dto.request.AtualizarStatusRequest;
 import com.galeriaseleta.dto.request.CriarPedidoRequest;
+import com.galeriaseleta.dto.response.PageResponse;
 import com.galeriaseleta.dto.response.PedidoResponse;
 import com.galeriaseleta.security.UsuarioDetails;
 import com.galeriaseleta.service.PedidoService;
@@ -9,8 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 // Fluxo de status: AGUARDANDO_PAGAMENTO → CONFIRMADO → EM_SEPARACAO → ENVIADO → ENTREGUE | CANCELADO
 @RestController
@@ -23,10 +22,16 @@ public class PedidoController {
         this.pedidoService = pedidoService;
     }
 
-    /** Lista os pedidos do usuário autenticado. Param opcional: status. */
+    /** Lista pedidos com paginação. Admins veem todos; clientes veem apenas os próprios. */
     @GetMapping
-    public ResponseEntity<List<PedidoResponse>> listarPedidos(@RequestParam(required = false) String status) {
-        return ResponseEntity.ok(pedidoService.listar(status));
+    public ResponseEntity<PageResponse<PedidoResponse>> listarPedidos(
+            @AuthenticationPrincipal UsuarioDetails ud,
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        boolean isAdmin = "admin".equals(ud.getUsuario().getPapel());
+        Integer usuarioId = isAdmin ? null : ud.getUsuario().getId();
+        return ResponseEntity.ok(pedidoService.listarPaginado(usuarioId, status, page, size));
     }
 
     /** Retorna os detalhes de um pedido pelo ID. */

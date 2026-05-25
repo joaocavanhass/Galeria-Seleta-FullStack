@@ -1,9 +1,14 @@
 package com.galeriaseleta.service;
 
 import com.galeriaseleta.dto.request.CriarPedidoRequest;
+import com.galeriaseleta.dto.response.PageResponse;
 import com.galeriaseleta.dto.response.PedidoResponse;
 import com.galeriaseleta.model.*;
 import com.galeriaseleta.repository.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -38,16 +43,38 @@ public class PedidoService {
         this.opcaoFreteRepository = opcaoFreteRepository;
     }
 
-    public List<PedidoResponse> listar(String status) {
-        List<Pedido> pedidos = (status != null && !status.isBlank())
-                ? pedidoRepository.findByStatus(status)
-                : pedidoRepository.findAll();
-
+    public List<PedidoResponse> listar(Integer usuarioId, String status) {
+        List<Pedido> pedidos;
+        if (usuarioId != null) {
+            pedidos = (status != null && !status.isBlank())
+                    ? pedidoRepository.findByUsuarioIdAndStatus(usuarioId, status)
+                    : pedidoRepository.findByUsuarioId(usuarioId);
+        } else {
+            pedidos = (status != null && !status.isBlank())
+                    ? pedidoRepository.findByStatus(status)
+                    : pedidoRepository.findAll();
+        }
         return pedidos.stream()
                 .map(pedido -> PedidoResponse.from(
                         pedido,
                         itemPedidoRepository.findByPedidoId(pedido.getId())))
                 .toList();
+    }
+
+    public PageResponse<PedidoResponse> listarPaginado(Integer usuarioId, String status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        Page<Pedido> resultado;
+        if (usuarioId != null) {
+            resultado = (status != null && !status.isBlank())
+                    ? pedidoRepository.findByUsuarioIdAndStatus(usuarioId, status, pageable)
+                    : pedidoRepository.findByUsuarioId(usuarioId, pageable);
+        } else {
+            resultado = (status != null && !status.isBlank())
+                    ? pedidoRepository.findByStatus(status, pageable)
+                    : pedidoRepository.findAll(pageable);
+        }
+        return PageResponse.from(resultado,
+                pedido -> PedidoResponse.from(pedido, itemPedidoRepository.findByPedidoId(pedido.getId())));
     }
 
     public PedidoResponse buscarPorId(Long id) {

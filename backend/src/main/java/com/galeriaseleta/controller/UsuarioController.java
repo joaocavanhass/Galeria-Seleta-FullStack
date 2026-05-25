@@ -4,6 +4,7 @@ import com.galeriaseleta.dto.request.AlterarSenhaRequest;
 import com.galeriaseleta.dto.request.AtualizarPerfilRequest;
 import com.galeriaseleta.dto.request.EnderecoRequest;
 import com.galeriaseleta.dto.response.EnderecoResponse;
+import com.galeriaseleta.dto.response.PageResponse;
 import com.galeriaseleta.dto.response.UsuarioResponse;
 import com.galeriaseleta.security.UsuarioDetails;
 import com.galeriaseleta.service.UsuarioService;
@@ -25,14 +26,15 @@ public class UsuarioController {
     }
 
     @GetMapping
-    public ResponseEntity<?> listarTodos(@AuthenticationPrincipal UsuarioDetails ud) {
+    public ResponseEntity<?> listarTodos(
+            @AuthenticationPrincipal UsuarioDetails ud,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
         if (ud == null || !"admin".equals(ud.getUsuario().getPapel())) {
             return ResponseEntity.status(403).body("Acesso negado.");
         }
-        List<UsuarioResponse> lista = usuarioService.listarTodos().stream()
-                .map(UsuarioResponse::from)
-                .toList();
-        return ResponseEntity.ok(lista);
+        PageResponse<UsuarioResponse> resultado = usuarioService.listarPaginado(page, size);
+        return ResponseEntity.ok(resultado);
     }
 
     @PatchMapping("/{id}/papel")

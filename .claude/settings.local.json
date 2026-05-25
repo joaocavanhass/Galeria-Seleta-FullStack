@@ -12,7 +12,8 @@
       "PowerShell(cd \"c:\\\\Users\\\\gusta\\\\Downloads\\\\BackEnd_GaleriaSeleta-main \\(2\\)\\\\frontend\"; npm run build 2>&1 | Where-Object { $_ -match \"ERROR|error|Error\" } | Select-Object -First 40)",
       "PowerShell(cd \"c:\\\\Users\\\\gusta\\\\Downloads\\\\BackEnd_GaleriaSeleta-main \\(2\\)\\\\frontend\"; npm run build 2>&1 | Where-Object { $_ -match \"\\\\[ERROR\\\\]|\\\\[31m\" } | Select-Object -First 20)",
       "PowerShell(cd \"c:\\\\Users\\\\gusta\\\\Downloads\\\\BackEnd_GaleriaSeleta-main \\(2\\)\\\\frontend\"; npm run build 2>&1 | Where-Object { $_ -match \"\\\\[ERROR\\\\]\" })",
-      "Bash(grep -i \"\\\\.ts$\\\\|\\\\.java$\")"
+      "Bash(grep -i \"\\\\.ts$\\\\|\\\\.java$\")",
+      "Bash(./mvnw.cmd compile *)"
     ]
   }
 }
