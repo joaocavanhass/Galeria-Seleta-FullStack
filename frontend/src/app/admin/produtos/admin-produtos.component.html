@@ -27,7 +27,7 @@
     </select>
     <select [ngModel]="filtroCategoria()" (ngModelChange)="filtroCategoria.set($event)">
       <option value="todas">Todas as categorias</option>
-      <option *ngFor="let c of categorias" [value]="c">{{ c }}</option>
+      <option *ngFor="let c of nomesCategorias" [value]="c">{{ c }}</option>
     </select>
   </div>
 
@@ -39,7 +39,6 @@
             <th>Produto</th>
             <th>Categoria</th>
             <th>Preço</th>
-            <th>Estoque</th>
             <th>Status</th>
             <th>Ações</th>
           </tr>
@@ -59,15 +58,7 @@
               </div>
             </td>
             <td class="email-cell">{{ p.categoria || '—' }}</td>
-            <td>
-              <div class="price-cell">
-                <span>{{ formatCurrency(p.preco) }}</span>
-                <span *ngIf="p.preco_desconto" class="preco-desconto">{{ formatCurrency(p.preco_desconto) }}</span>
-              </div>
-            </td>
-            <td>
-              <span [class.low-stock]="p.estoque < 5">{{ p.estoque }}</span>
-            </td>
+            <td>{{ formatCurrency(p.preco) }}</td>
             <td>
               <span class="status-badge" [ngClass]="{
                 'prod-ativo': p.status === 'ativo',
@@ -98,7 +89,7 @@
             </td>
           </tr>
           <tr *ngIf="filtrados().length === 0">
-            <td colspan="6" class="empty-row">Nenhum produto encontrado.</td>
+            <td colspan="5" class="empty-row">Nenhum produto encontrado.</td>
           </tr>
         </tbody>
       </table>
@@ -127,7 +118,7 @@
           <label>Categoria</label>
           <select [(ngModel)]="p.categoria">
             <option value="">Selecionar...</option>
-            <option *ngFor="let c of categorias" [value]="c">{{ c }}</option>
+            <option *ngFor="let c of nomesCategorias" [value]="c">{{ c }}</option>
           </select>
         </div>
         <div class="form-field">
@@ -143,21 +134,18 @@
           <input type="number" [(ngModel)]="p.preco" placeholder="0.00" min="0" step="0.01" />
         </div>
         <div class="form-field">
-          <label>Preço Promocional (R$)</label>
-          <input type="number" [(ngModel)]="p.preco_desconto" placeholder="0.00" min="0" step="0.01" />
-        </div>
-        <div class="form-field">
-          <label>Estoque</label>
-          <input type="number" [(ngModel)]="p.estoque" placeholder="0" min="0" />
-        </div>
-        <div class="form-field">
           <label>URL da Imagem</label>
           <input type="url" [(ngModel)]="p.imagem_url" placeholder="https://..." />
         </div>
       </div>
+      <div *ngIf="erroSalvar()" style="color:#e53935;font-size:.85rem;margin-bottom:.5rem;padding:.5rem .75rem;background:#fff0f0;border-radius:6px;border:1px solid #ffcdd2">
+        {{ erroSalvar() }}
+      </div>
       <div class="modal-actions">
         <button class="btn-secondary" (click)="fecharModal()">Cancelar</button>
-        <button class="btn-primary" (click)="salvarProduto()">Salvar Produto</button>
+        <button class="btn-primary" (click)="salvarProduto()" [disabled]="salvando()">
+          {{ salvando() ? 'Salvando…' : 'Salvar Produto' }}
+        </button>
       </div>
     </div>
   </div>

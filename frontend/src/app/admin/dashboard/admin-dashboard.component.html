@@ -17,7 +17,6 @@
       <div class="stat-body">
         <span class="stat-label">Total de Usuários</span>
         <span class="stat-value">{{ stats.totalUsuarios }}</span>
-        <span class="stat-delta up">↑ +12 este mês</span>
       </div>
     </div>
 
@@ -32,7 +31,6 @@
       <div class="stat-body">
         <span class="stat-label">Total de Pedidos</span>
         <span class="stat-value">{{ stats.totalPedidos }}</span>
-        <span class="stat-delta up">↑ +8 esta semana</span>
       </div>
     </div>
 
@@ -45,9 +43,8 @@
         </svg>
       </div>
       <div class="stat-body">
-        <span class="stat-label">Produtos em Estoque</span>
+        <span class="stat-label">Produtos Cadastrados</span>
         <span class="stat-value">{{ stats.produtosEstoque }}</span>
-        <span class="stat-delta warn">⚠ 3 com estoque baixo</span>
       </div>
     </div>
 
@@ -60,7 +57,6 @@
       <div class="stat-body">
         <span class="stat-label">Receita Total</span>
         <span class="stat-value">{{ formatCurrency(stats.receitaTotal) }}</span>
-        <span class="stat-delta up">↑ +18% vs. mês anterior</span>
       </div>
     </div>
   </div>
@@ -70,7 +66,7 @@
     <div class="chart-card">
       <div class="card-header">
         <h2>Vendas — Últimos 7 dias</h2>
-        <span class="total-week">{{ formatCurrency(13500) }} esta semana</span>
+        <span class="total-week">{{ formatCurrency(stats.receitaTotal) }} total</span>
       </div>
       <div class="bar-chart">
         <div class="bar-group" *ngFor="let v of stats.vendasSemana">
@@ -83,24 +79,25 @@
       </div>
     </div>
 
-    <!-- LOW STOCK ALERT -->
+    <!-- PRODUTOS RECENTES -->
     <div class="alerts-card">
       <div class="card-header">
-        <h2>⚠ Estoque Baixo</h2>
+        <h2>Produtos Recentes</h2>
+        <a routerLink="/admin/produtos" class="ver-todos">Ver todos →</a>
       </div>
       <div class="alert-list">
-        <div class="alert-item" *ngFor="let item of [
-          {nome:'Anel Solitário Ouro 18k', estoque: 2, limite: 5},
-          {nome:'Colar Choker Veludo Preto', estoque: 4, limite: 5},
-          {nome:'Pulseira Couro Trançado', estoque: 1, limite: 5}
-        ]">
+        <div class="alert-item" *ngFor="let p of produtosRecentes">
           <div class="alert-info">
-            <span class="alert-produto">{{ item.nome }}</span>
-            <span class="alert-stock" [class.critical]="item.estoque <= 2">{{ item.estoque }} unid.</span>
+            <span class="alert-produto">{{ p.nome }}</span>
+            <span class="status-badge" [ngClass]="{
+              'prod-ativo': p.status === 'ativo',
+              'prod-inativo': p.status === 'inativo',
+              'prod-rascunho': p.status === 'rascunho'
+            }">{{ p.status }}</span>
           </div>
-          <div class="stock-bar-track">
-            <div class="stock-bar-fill" [style.width.%]="(item.estoque / item.limite) * 100"></div>
-          </div>
+        </div>
+        <div *ngIf="produtosRecentes.length === 0" style="color:#aaa;padding:.5rem 0">
+          Nenhum produto cadastrado.
         </div>
       </div>
     </div>

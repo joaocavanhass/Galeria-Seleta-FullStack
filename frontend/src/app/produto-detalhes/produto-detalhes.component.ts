@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Produto } from '../core/models/produto.model';
-import { PRODUTOS_MOCK } from '../core/mocks/produtos.mock';
+import { ProdutoService } from '../core/services/produto.service';
 import { CarrinhoService } from '../core/services/carrinho.service';
 
 @Component({
@@ -18,17 +18,26 @@ export class ProdutoDetalhesComponent implements OnInit {
   tamanhoSelecionado: string | null = null;
   quantidade = 1;
   adicionado = false;
+  carregando = true;
 
   readonly tamanhos = ['PP', 'P', 'M', 'G', 'GG'];
 
   private route    = inject(ActivatedRoute);
   private router   = inject(Router);
   private carrinho = inject(CarrinhoService);
+  private produtoService = inject(ProdutoService);
 
   ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.produto = PRODUTOS_MOCK.find(p => p.id === id) ?? null;
-    if (!this.produto) this.router.navigate(['/produtos']);
+    this.produtoService.buscarPorId(id).subscribe({
+      next: (p) => {
+        this.produto   = p;
+        this.carregando = false;
+      },
+      error: () => {
+        this.router.navigate(['/produtos']);
+      }
+    });
   }
 
   get imagemAtual(): string {

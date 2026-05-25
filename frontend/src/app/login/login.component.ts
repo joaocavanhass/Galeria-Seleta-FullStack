@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
-import { AdminAuthService } from '../admin/services/admin-auth.service';
+import { AuthService } from '../core/services/auth.service';
 
 interface FormLogin {
   email: string;
@@ -21,16 +21,16 @@ export class LoginComponent {
 
   form: FormLogin = { email: '', senha: '', lembrar: false };
 
-  mostrarSenha = false;
-  emailTocado  = false;
-  senhaTocada  = false;
-  carregando   = false;
+  mostrarSenha    = false;
+  emailTocado     = false;
+  senhaTocada     = false;
+  carregando      = false;
   mensagemSucesso = '';
   mensagemErro    = '';
 
   constructor(
     private router: Router,
-    private adminAuth: AdminAuthService
+    private auth: AuthService
   ) {}
 
   get emailValido(): boolean {
@@ -49,7 +49,7 @@ export class LoginComponent {
     this.emailTocado = true;
     this.senhaTocada = true;
     this.mensagemSucesso = '';
-    this.mensagemErro = '';
+    this.mensagemErro    = '';
 
     if (!this.formularioValido) {
       this.mensagemErro = 'Preencha os campos corretamente.';
@@ -58,19 +58,16 @@ export class LoginComponent {
 
     this.carregando = true;
 
-    setTimeout(() => {
-      this.carregando = false;
-
-      // Verifica se é admin → redireciona para o painel
-      const isAdmin = this.adminAuth.tryAdminLogin(this.form.email, this.form.senha);
-      if (isAdmin) {
-        this.router.navigate(['/admin/dashboard']);
-        return;
+    this.auth.login({ email: this.form.email, senha: this.form.senha }).subscribe({
+      next: (res) => {
+        this.carregando = false;
+        const destino = res.usuario.papel === 'admin' ? '/admin/dashboard' : '/';
+        this.router.navigate([destino]);
+      },
+      error: (err) => {
+        this.carregando = false;
+        this.mensagemErro = err.error?.erro ?? 'Email ou senha incorretos.';
       }
-
-      // Usuário comum → substituir pela autenticação real
-      this.mensagemSucesso = 'Login realizado com sucesso!';
-      this.router.navigate(['/']);
-    }, 1000);
+    });
   }
 }

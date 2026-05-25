@@ -27,6 +27,16 @@ public class UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    public List<Usuario> listarTodos() {
+        return usuarioRepository.findAll();
+    }
+
+    public Usuario atualizarPapel(Long id, String papel) {
+        Usuario usuario = buscarPorId(id);
+        usuario.setPapel(papel);
+        return usuarioRepository.save(usuario);
+    }
+
     public Usuario buscarPorId(Long id) {
         return usuarioRepository.findById(id.intValue())
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado: " + id));

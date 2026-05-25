@@ -29,6 +29,9 @@ public class ProdutoResponse {
         if (produto.getCategoria() != null) {
             dto.categoria = CategoriaResponse.from(produto.getCategoria());
         }
+        if (produto.getFotos() != null) {
+            dto.fotos = produto.getFotos().stream().map(FotoProdutoResponse::from).toList();
+        }
         return dto;
     }
 

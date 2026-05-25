@@ -3,9 +3,11 @@ package com.galeriaseleta.controller;
 import com.galeriaseleta.dto.request.AtualizarStatusRequest;
 import com.galeriaseleta.dto.request.CriarPedidoRequest;
 import com.galeriaseleta.dto.response.PedidoResponse;
+import com.galeriaseleta.security.UsuarioDetails;
 import com.galeriaseleta.service.PedidoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,7 +37,11 @@ public class PedidoController {
 
     /** Cria um novo pedido (finalização do checkout). */
     @PostMapping
-    public ResponseEntity<PedidoResponse> criarPedido(@RequestBody CriarPedidoRequest request) {
+    public ResponseEntity<PedidoResponse> criarPedido(
+            @AuthenticationPrincipal UsuarioDetails ud,
+            @RequestBody CriarPedidoRequest request) {
+        // Garante que o pedido é criado para o usuário autenticado
+        request.setUsuarioId((long) ud.getUsuario().getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(pedidoService.criar(request));
     }
 

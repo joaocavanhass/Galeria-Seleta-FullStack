@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class PedidoService {
@@ -99,11 +101,18 @@ public class PedidoService {
 
         Pedido pedidoSalvo = pedidoRepository.save(pedido);
 
-        List<ItemPedido> itensSalvos = produtos.stream().map(produto -> {
+        // Agrupa IDs repetidos em quantidade por produto
+        Map<Integer, Long> qtdPorProduto = produtos.stream()
+                .collect(Collectors.groupingBy(Produto::getId, Collectors.counting()));
+
+        List<ItemPedido> itensSalvos = qtdPorProduto.entrySet().stream().map(entry -> {
+            Produto produto = produtos.stream()
+                    .filter(p -> p.getId().equals(entry.getKey()))
+                    .findFirst().orElseThrow();
             ItemPedido item = new ItemPedido();
             item.setPedido(pedidoSalvo);
             item.setProduto(produto);
-            item.setQuantidade(1);
+            item.setQuantidade(entry.getValue().intValue());
             item.setPrecoPago(produto.getPreco());
             return itemPedidoRepository.save(item);
         }).toList();

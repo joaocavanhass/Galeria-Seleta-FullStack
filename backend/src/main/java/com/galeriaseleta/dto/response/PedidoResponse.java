@@ -8,6 +8,18 @@ import java.util.List;
 
 public class PedidoResponse {
 
+    public static class UsuarioResumo {
+        private Integer id;
+        private String nome;
+        private String email;
+        public UsuarioResumo(Integer id, String nome, String email) {
+            this.id = id; this.nome = nome; this.email = email;
+        }
+        public Integer getId()  { return id; }
+        public String getNome() { return nome; }
+        public String getEmail(){ return email; }
+    }
+
     private Integer id;
     private String status;
     private BigDecimal subtotal;
@@ -15,6 +27,7 @@ public class PedidoResponse {
     private BigDecimal desconto;
     private BigDecimal total;
     private LocalDateTime criadoEm;
+    private UsuarioResumo usuario;
     private EnderecoResponse endereco;
     private OpcaoFreteResponse frete;
     private CupomResponse cupom;
@@ -29,6 +42,13 @@ public class PedidoResponse {
         dto.desconto = pedido.getDesconto();
         dto.total = pedido.getTotal();
         dto.criadoEm = pedido.getCriadoEm();
+        if (pedido.getUsuario() != null) {
+            dto.usuario = new UsuarioResumo(
+                pedido.getUsuario().getId(),
+                pedido.getUsuario().getNome(),
+                pedido.getUsuario().getEmail()
+            );
+        }
         if (pedido.getEndereco() != null) {
             dto.endereco = EnderecoResponse.from(pedido.getEndereco());
         }
@@ -44,15 +64,16 @@ public class PedidoResponse {
         return dto;
     }
 
-    public Integer getId() { return id; }
-    public String getStatus() { return status; }
-    public BigDecimal getSubtotal() { return subtotal; }
-    public BigDecimal getValorFrete() { return valorFrete; }
-    public BigDecimal getDesconto() { return desconto; }
-    public BigDecimal getTotal() { return total; }
+    public Integer getId()             { return id; }
+    public String getStatus()          { return status; }
+    public BigDecimal getSubtotal()    { return subtotal; }
+    public BigDecimal getValorFrete()  { return valorFrete; }
+    public BigDecimal getDesconto()    { return desconto; }
+    public BigDecimal getTotal()       { return total; }
     public LocalDateTime getCriadoEm() { return criadoEm; }
-    public EnderecoResponse getEndereco() { return endereco; }
-    public OpcaoFreteResponse getFrete() { return frete; }
-    public CupomResponse getCupom() { return cupom; }
+    public UsuarioResumo getUsuario()  { return usuario; }
+    public EnderecoResponse getEndereco()   { return endereco; }
+    public OpcaoFreteResponse getFrete()    { return frete; }
+    public CupomResponse getCupom()         { return cupom; }
     public List<ItemPedidoResponse> getItens() { return itens; }
 }

@@ -5,7 +5,7 @@
       <p>Acompanhe e gerencie todos os pedidos da loja</p>
     </div>
     <div class="filter-group">
-      <button *ngFor="let s of ['todos', 'pendente', 'pago', 'enviado', 'entregue', 'cancelado']"
+      <button *ngFor="let s of ['todos', 'pendente', 'confirmado', 'em_separacao', 'enviado', 'entregue', 'cancelado']"
         class="filter-pill"
         [class.active]="filtroStatus() === s"
         (click)="filtroStatus.set(s)">
@@ -14,7 +14,9 @@
     </div>
   </div>
 
-  <div class="table-card">
+  <div *ngIf="carregando()" style="text-align:center;padding:2rem;color:#aaa">Carregando pedidos…</div>
+
+  <div class="table-card" *ngIf="!carregando()">
     <div class="table-wrap">
       <table class="admin-table">
         <thead>
@@ -22,7 +24,6 @@
             <th>Pedido</th>
             <th>Cliente</th>
             <th>Data</th>
-            <th>Pagamento</th>
             <th>Total</th>
             <th>Status</th>
             <th>Ações</th>
@@ -33,15 +34,14 @@
             <td class="id-cell">#{{ p.id }}</td>
             <td>
               <div class="user-cell">
-                <div class="avatar">{{ p.usuario_nome.charAt(0) }}</div>
+                <div class="avatar">{{ (p.usuario?.nome || '?').charAt(0) }}</div>
                 <div>
-                  <div style="font-size:13px;color:#f2f2f0">{{ p.usuario_nome }}</div>
-                  <div class="email-cell">{{ p.usuario_email }}</div>
+                  <div style="font-size:13px;color:#f2f2f0">{{ p.usuario?.nome }}</div>
+                  <div class="email-cell">{{ p.usuario?.email }}</div>
                 </div>
               </div>
             </td>
-            <td class="date-cell">{{ p.criado_em }}</td>
-            <td class="email-cell">{{ getPagamentoLabel(p.forma_pagamento) }}</td>
+            <td class="date-cell">{{ (p.criadoEm || '').slice(0,10) }}</td>
             <td style="font-weight:600;color:#f2f2f0">{{ formatCurrency(p.total) }}</td>
             <td><span class="status-badge" [ngClass]="getStatusClass(p.status)">{{ getStatusLabel(p.status) }}</span></td>
             <td>
@@ -56,7 +56,7 @@
             </td>
           </tr>
           <tr *ngIf="filtrados().length === 0">
-            <td colspan="7" class="empty-row">Nenhum pedido encontrado.</td>
+            <td colspan="6" class="empty-row">Nenhum pedido encontrado.</td>
           </tr>
         </tbody>
       </table>
@@ -72,13 +72,11 @@
       <button class="modal-close" (click)="fecharDetalhe()">×</button>
     </div>
     <div class="modal-body" *ngIf="pedidoDetalhe() as p">
-      <!-- Status atual -->
       <div class="detalhe-status-row">
         <span class="status-badge" [ngClass]="getStatusClass(p.status)">{{ getStatusLabel(p.status) }}</span>
-        <span class="date-cell">{{ p.criado_em }}</span>
+        <span class="date-cell">{{ (p.criadoEm || '').slice(0,10) }}</span>
       </div>
 
-      <!-- Atualizar status -->
       <div class="status-update">
         <label>Atualizar Status:</label>
         <div class="status-pills">
@@ -92,27 +90,27 @@
         </div>
       </div>
 
-      <!-- Info do cliente -->
       <div class="detalhe-section">
         <div class="section-title">Cliente</div>
         <div class="detail-grid">
-          <div class="detail-item"><span class="detail-label">Nome</span><span>{{ p.usuario_nome }}</span></div>
-          <div class="detail-item"><span class="detail-label">E-mail</span><span>{{ p.usuario_email }}</span></div>
-          <div class="detail-item"><span class="detail-label">Pagamento</span><span>{{ getPagamentoLabel(p.forma_pagamento) }}</span></div>
-          <div class="detail-item full"><span class="detail-label">Endereço de Entrega</span><span>{{ p.endereco_entrega }}</span></div>
+          <div class="detail-item"><span class="detail-label">Nome</span><span>{{ p.usuario?.nome }}</span></div>
+          <div class="detail-item"><span class="detail-label">E-mail</span><span>{{ p.usuario?.email }}</span></div>
+          <div class="detail-item full">
+            <span class="detail-label">Endereço de Entrega</span>
+            <span>{{ p.endereco?.rua }}, {{ p.endereco?.cidade }} – {{ p.endereco?.estado }} – {{ p.endereco?.cep }}</span>
+          </div>
         </div>
       </div>
 
-      <!-- Itens -->
       <div class="detalhe-section">
         <div class="section-title">Itens do Pedido</div>
         <div class="itens-list">
           <div class="item-row" *ngFor="let item of p.itens">
             <div class="item-info">
-              <div class="item-nome">{{ item.produto_nome }}</div>
-              <div class="item-qty">{{ item.quantidade }}x {{ formatCurrency(item.preco_unitario) }}</div>
+              <div class="item-nome">{{ item.produto?.nome }}</div>
+              <div class="item-qty">{{ item.quantidade }}x {{ formatCurrency(item.precoPago) }}</div>
             </div>
-            <div class="item-total">{{ formatCurrency(item.subtotal) }}</div>
+            <div class="item-total">{{ formatCurrency(item.precoPago * item.quantidade) }}</div>
           </div>
           <div class="total-row">
             <span>Total do Pedido</span>

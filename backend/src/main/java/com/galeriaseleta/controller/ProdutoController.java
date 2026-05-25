@@ -2,6 +2,7 @@ package com.galeriaseleta.controller;
 
 import com.galeriaseleta.dto.request.AtualizarStatusRequest;
 import com.galeriaseleta.dto.request.ProdutoRequest;
+import com.galeriaseleta.dto.response.FotoProdutoResponse;
 import com.galeriaseleta.dto.response.ProdutoResponse;
 import com.galeriaseleta.service.ProdutoService;
 import org.springframework.http.HttpStatus;
@@ -90,6 +91,16 @@ public class ProdutoController {
         statusRequest.setStatus(request.getStatus());
         produtoService.atualizar(id, statusRequest);
         return ResponseEntity.ok().build();
+    }
+
+    /** Define a imagem principal de um produto (substitui fotos existentes). */
+    @PostMapping("/{id}/fotos")
+    public ResponseEntity<FotoProdutoResponse> adicionarFoto(
+            @PathVariable Long id,
+            @RequestBody java.util.Map<String, String> body) {
+        String url = body.get("url");
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(FotoProdutoResponse.from(produtoService.setPrincipalFoto(id, url)));
     }
 
     /** Remove um produto pelo ID. */

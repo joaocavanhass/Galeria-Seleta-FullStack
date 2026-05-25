@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
@@ -37,6 +39,10 @@ public class Produto {
     @Column(name = "criado_em")
     private LocalDateTime criadoEm = LocalDateTime.now();
 
+    @OneToMany(mappedBy = "produto", fetch = FetchType.EAGER)
+    @OrderBy("ordem ASC")
+    private List<FotoProduto> fotos = new ArrayList<>();
+
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
 
@@ -60,4 +66,7 @@ public class Produto {
 
     public LocalDateTime getCriadoEm() { return criadoEm; }
     public void setCriadoEm(LocalDateTime criadoEm) { this.criadoEm = criadoEm; }
+
+    public List<FotoProduto> getFotos() { return fotos; }
+    public void setFotos(List<FotoProduto> fotos) { this.fotos = fotos; }
 }

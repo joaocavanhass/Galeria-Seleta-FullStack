@@ -1,10 +1,7 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PEDIDOS_MOCK } from '../mocks/admin.mocks';
-import { Pedido } from '../models/admin.models';
-
-type PedidoStatus = 'pendente' | 'pago' | 'enviado' | 'entregue' | 'cancelado';
+import { PedidoService, PedidoApi } from '../../core/services/pedido.service';
 
 @Component({
   selector: 'app-admin-pedidos',
@@ -13,43 +10,61 @@ type PedidoStatus = 'pendente' | 'pago' | 'enviado' | 'entregue' | 'cancelado';
   templateUrl: './admin-pedidos.component.html',
   styleUrls: ['./admin-pedidos.component.css']
 })
-export class AdminPedidosComponent {
-  pedidos = signal<Pedido[]>([...PEDIDOS_MOCK]);
-  filtroStatus = signal('todos');
-  pedidoDetalhe = signal<Pedido | null>(null);
+export class AdminPedidosComponent implements OnInit {
+  pedidos        = signal<PedidoApi[]>([]);
+  filtroStatus   = signal('todos');
+  pedidoDetalhe  = signal<PedidoApi | null>(null);
+  carregando     = signal(true);
 
-  statusOptions: PedidoStatus[] = ['pendente', 'pago', 'enviado', 'entregue', 'cancelado'];
+  statusOptions = ['pendente', 'confirmado', 'em_separacao', 'enviado', 'entregue', 'cancelado'];
 
   filtrados = computed(() => {
     if (this.filtroStatus() === 'todos') return this.pedidos();
     return this.pedidos().filter(p => p.status === this.filtroStatus());
   });
 
-  verDetalhe(p: Pedido) { this.pedidoDetalhe.set(p); }
-  fecharDetalhe() { this.pedidoDetalhe.set(null); }
+  constructor(private pedidoService: PedidoService) {}
 
-  atualizarStatus(p: Pedido, status: PedidoStatus) {
-    this.pedidos.update(lista => lista.map(x =>
-      x.id === p.id ? { ...x, status, atualizado_em: new Date().toISOString().slice(0,10) } : x
-    ));
+  ngOnInit(): void {
+    this.carregarPedidos();
+  }
+
+  carregarPedidos(): void {
+    this.carregando.set(true);
+    this.pedidoService.listar().subscribe({
+      next: (lista) => { this.pedidos.set(lista); this.carregando.set(false); },
+      error: () => { this.carregando.set(false); }
+    });
+  }
+
+  verDetalhe(p: PedidoApi) { this.pedidoDetalhe.set(p); }
+  fecharDetalhe()           { this.pedidoDetalhe.set(null); }
+
+  atualizarStatus(p: PedidoApi, status: string) {
+    this.pedidoService.atualizarStatus(p.id, status).subscribe({
+      next: () => this.carregarPedidos(),
+      error: () => {}
+    });
     if (this.pedidoDetalhe()?.id === p.id) {
       this.pedidoDetalhe.update(d => d ? { ...d, status } : null);
     }
   }
 
   getStatusClass(s: string): string {
-    const m: Record<string, string> = { pendente:'status-pendente', pago:'status-pago', enviado:'status-enviado', entregue:'status-entregue', cancelado:'status-cancelado' };
+    const m: Record<string, string> = {
+      pendente: 'status-pendente', confirmado: 'status-pago',
+      em_separacao: 'status-pago', enviado: 'status-enviado',
+      entregue: 'status-entregue', cancelado: 'status-cancelado'
+    };
     return m[s] || '';
   }
 
   getStatusLabel(s: string): string {
-    const m: Record<string, string> = { pendente:'Pendente', pago:'Pago', enviado:'Enviado', entregue:'Entregue', cancelado:'Cancelado' };
+    const m: Record<string, string> = {
+      pendente: 'Pendente', confirmado: 'Confirmado', em_separacao: 'Em separação',
+      enviado: 'Enviado', entregue: 'Entregue', cancelado: 'Cancelado'
+    };
     return m[s] || s;
-  }
-
-  getPagamentoLabel(p: string): string {
-    const m: Record<string, string> = { cartao_credito:'Cartão de Crédito', pix:'PIX', boleto:'Boleto' };
-    return m[p] || p;
   }
 
   formatCurrency(v: number): string {

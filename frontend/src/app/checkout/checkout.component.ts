@@ -1,7 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CarrinhoService } from '../core/services/carrinho.service';
+import { PedidoService, PedidoApi } from '../core/services/pedido.service';
+import { UsuarioService, EnderecoApi } from '../core/services/usuario.service';
+import { AuthService } from '../core/services/auth.service';
 
 export type FreteId = 'padrao' | 'expresso' | 'retirada';
 export type PagtoId = 'cartao' | 'pix' | 'dinheiro' | 'boleto';
@@ -23,21 +27,23 @@ export interface PagtoOpcao {
 @Component({
   selector: 'app-checkout',
   standalone: true,
-  imports: [CommonModule, CurrencyPipe],
+  imports: [CommonModule, CurrencyPipe, FormsModule],
   templateUrl: './checkout.component.html',
   styleUrl: './checkout.component.css',
 })
-export class CheckoutComponent {
+export class CheckoutComponent implements OnInit {
 
-  private router   = inject(Router);
-  readonly carrinho = inject(CarrinhoService);
+  private router         = inject(Router);
+  private auth           = inject(AuthService);
+  private pedidoService  = inject(PedidoService);
+  private usuarioService = inject(UsuarioService);
+  readonly carrinho      = inject(CarrinhoService);
 
-  // ── Dados mockados ──────────────────────────────────────────
-  readonly usuario = {
-    nome: 'Eduardo Albuquerque',
-    tel: '(11) 90000-0000',
-    endereco: 'Condomínio Arali – Casa Ryan, SP'
-  };
+  enderecos         = signal<EnderecoApi[]>([]);
+  enderecoSelecionado = signal<EnderecoApi | null>(null);
+  carregandoEnderecos = signal(true);
+  erroCheckout      = signal('');
+  pedidoCriado      = signal<PedidoApi | null>(null);
 
   readonly freteOpcoes: FreteOpcao[] = [
     { id: 'padrao',   label: 'Padrão',          prazo: '5 – 7 Dias', preco: 29.90 },
@@ -52,20 +58,31 @@ export class CheckoutComponent {
     { id: 'boleto',   label: 'Boleto' },
   ];
 
-  // ── Estado ──────────────────────────────────────────────────
   freteSelecionado = signal<FreteId>('retirada');
   pagtoSelecionado = signal<PagtoId>('pix');
   step             = signal<1 | 2 | 3>(1);
-  numeroPedido     = signal<number>(0);
   copiado          = signal<boolean>(false);
 
   readonly codigoPix = 'DN4QSND1Z91H2S3HY84TH5JAD4J8NQDBU923O9BHJ3DC4JE3XLANSFS7PAHHDF29B3S4UHAUSD1PJ3HDJBFA2PB3DR023WJADN4XHSL8NKJES71JEB23Q3XKSB3U4HUGJ3KL3DJ';
 
-  // ── Totais vindos do serviço ────────────────────────────────
-  get subtotal(): number { return this.carrinho.subtotal(); }
-  get desconto(): number { return this.carrinho.desconto(); }
+  ngOnInit(): void {
+    this.usuarioService.listarEnderecos().subscribe({
+      next: (lista) => {
+        this.enderecos.set(lista);
+        const principal = lista.find(e => e.principal) ?? lista[0] ?? null;
+        this.enderecoSelecionado.set(principal);
+        this.carregandoEnderecos.set(false);
+      },
+      error: () => { this.carregandoEnderecos.set(false); }
+    });
+  }
+
+  get usuario() { return this.auth.currentUser(); }
+
+  get subtotal():   number { return this.carrinho.subtotal(); }
+  get desconto():   number { return this.carrinho.desconto(); }
   get totalItens(): number { return this.carrinho.totalItens(); }
-  get itens() { return this.carrinho.itens(); }
+  get itens()              { return this.carrinho.itens(); }
 
   get freteValor(): number {
     return this.freteOpcoes.find(f => f.id === this.freteSelecionado())?.preco ?? 0;
@@ -91,14 +108,53 @@ export class CheckoutComponent {
     return map[this.pagtoSelecionado()];
   }
 
-  // ── Actions ──────────────────────────────────────────────────
   selecionarFrete(id: FreteId) { this.freteSelecionado.set(id); }
   selecionarPagto(id: PagtoId) { this.pagtoSelecionado.set(id); }
+  selecionarEndereco(e: EnderecoApi) { this.enderecoSelecionado.set(e); }
 
   confirmar(): void {
-    this.numeroPedido.set(Math.floor(1_000_000 + Math.random() * 9_000_000));
-    this.step.set(2);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const usuario  = this.auth.currentUser();
+    const endereco = this.enderecoSelecionado();
+
+    if (!usuario || !endereco) {
+      this.erroCheckout.set('Selecione um endereço de entrega.');
+      return;
+    }
+
+    if (this.itens.length === 0) {
+      this.erroCheckout.set('Seu carrinho está vazio.');
+      return;
+    }
+
+    // Monta lista de IDs repetindo pela quantidade de cada item
+    const produtoIds = this.itens.flatMap(item =>
+      Array(item.quantidade).fill(item.id) as number[]
+    );
+
+    // Mapeia frete selecionado para ID do backend (1=Padrão, 2=Expresso, null=Retirada)
+    const freteId = this.freteSelecionado() === 'padrao'   ? 1 :
+                    this.freteSelecionado() === 'expresso' ? 2 : undefined;
+
+    const cupom = this.carrinho.cupom() || undefined;
+
+    this.erroCheckout.set('');
+
+    this.pedidoService.criar({
+      usuarioId:    usuario.id,
+      enderecoId:   endereco.id,
+      produtoIds,
+      freteId,
+      codigoCupom:  cupom
+    }).subscribe({
+      next: (pedido) => {
+        this.pedidoCriado.set(pedido);
+        this.step.set(2);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      },
+      error: (err) => {
+        this.erroCheckout.set(err.error?.erro ?? 'Erro ao criar pedido. Tente novamente.');
+      }
+    });
   }
 
   finalizarPagamento(): void {
@@ -110,6 +166,16 @@ export class CheckoutComponent {
   voltarParaCheckout(): void {
     this.step.set(1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  numeroPedido(): number { return this.pedidoCriado()?.id ?? 0; }
+
+  get usuarioNome(): string    { return this.auth.currentUser()?.nome ?? ''; }
+  get usuarioTelefone(): string { return this.auth.currentUser()?.telefone ?? ''; }
+  get enderecoFormatado(): string {
+    const e = this.enderecoSelecionado();
+    if (!e) return 'Nenhum endereço cadastrado. Adicione um em seu perfil.';
+    return `${e.rua}, ${e.cidade} – ${e.estado} – ${e.cep}`;
   }
 
   irParaHome(): void    { this.router.navigate(['/']); }

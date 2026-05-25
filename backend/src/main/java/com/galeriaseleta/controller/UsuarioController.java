@@ -24,6 +24,29 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
+    @GetMapping
+    public ResponseEntity<?> listarTodos(@AuthenticationPrincipal UsuarioDetails ud) {
+        if (ud == null || !"admin".equals(ud.getUsuario().getPapel())) {
+            return ResponseEntity.status(403).body("Acesso negado.");
+        }
+        List<UsuarioResponse> lista = usuarioService.listarTodos().stream()
+                .map(UsuarioResponse::from)
+                .toList();
+        return ResponseEntity.ok(lista);
+    }
+
+    @PatchMapping("/{id}/papel")
+    public ResponseEntity<?> atualizarPapel(
+            @AuthenticationPrincipal UsuarioDetails ud,
+            @PathVariable Long id,
+            @RequestBody java.util.Map<String, String> body) {
+        if (ud == null || !"admin".equals(ud.getUsuario().getPapel())) {
+            return ResponseEntity.status(403).body("Acesso negado.");
+        }
+        String papel = body.get("papel");
+        return ResponseEntity.ok(UsuarioResponse.from(usuarioService.atualizarPapel(id, papel)));
+    }
+
     @GetMapping("/me")
     public ResponseEntity<UsuarioResponse> obterPerfil(@AuthenticationPrincipal UsuarioDetails ud) {
         return ResponseEntity.ok(UsuarioResponse.from(usuarioService.buscarPorId((long) ud.getUsuario().getId())));

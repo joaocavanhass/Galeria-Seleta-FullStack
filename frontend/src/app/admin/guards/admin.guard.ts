@@ -1,14 +1,22 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AdminAuthService } from '../services/admin-auth.service';
+import { AuthService } from '../../core/services/auth.service';
 
-/** Protege todas as rotas /admin/* — redireciona para /login se não autenticado */
 export const adminGuard: CanActivateFn = () => {
-  const auth = inject(AdminAuthService);
+  const auth   = inject(AuthService);
   const router = inject(Router);
 
-  if (auth.isAuthenticated()) {
+  const usuario = auth.currentUser();
+
+  if (usuario?.papel === 'admin') {
     return true;
   }
+
+  // Usuário logado mas não é admin → vai para a loja
+  if (usuario) {
+    return router.createUrlTree(['/']);
+  }
+
+  // Não logado → vai para login
   return router.createUrlTree(['/login']);
 };

@@ -25,6 +25,11 @@ public class Usuario {
 
     private String telefone;
 
+    private String cpf;
+
+    @Column(nullable = false)
+    private String papel = "cliente";
+
     @Column(name = "criado_em")
     private LocalDateTime criadoEm = LocalDateTime.now();
 
@@ -42,6 +47,12 @@ public class Usuario {
 
     public String getTelefone() { return telefone; }
     public void setTelefone(String telefone) { this.telefone = telefone; }
+
+    public String getCpf() { return cpf; }
+    public void setCpf(String cpf) { this.cpf = cpf; }
+
+    public String getPapel() { return papel; }
+    public void setPapel(String papel) { this.papel = papel; }
 
     public LocalDateTime getCriadoEm() { return criadoEm; }
     public void setCriadoEm(LocalDateTime criadoEm) { this.criadoEm = criadoEm; }

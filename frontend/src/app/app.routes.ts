@@ -8,6 +8,7 @@ import { ProdutosComponent } from './produtos/produtos.component';
 import { ProdutoDetalhesComponent } from './produto-detalhes/produto-detalhes.component';
 import { CheckoutComponent } from './checkout/checkout.component';
 import { CarrinhoComponent } from './carrinho/carrinho.component';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { path: '',              component: HomeComponent            },
@@ -17,8 +18,8 @@ export const routes: Routes = [
   { path: 'sobre',         component: SobreComponent           },
   { path: 'produtos',      component: ProdutosComponent        },
   { path: 'produtos/:id',  component: ProdutoDetalhesComponent },
-  { path: 'checkout',      component: CheckoutComponent        },
   { path: 'carrinho',      component: CarrinhoComponent        },
+  { path: 'checkout',      component: CheckoutComponent, canActivate: [authGuard] },
   {
     path: 'admin',
     loadChildren: () => import('./admin/admin.routes').then(m => m.adminRoutes)

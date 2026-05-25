@@ -1,8 +1,10 @@
 package com.galeriaseleta.service;
 
 import com.galeriaseleta.dto.request.ProdutoRequest;
+import com.galeriaseleta.model.FotoProduto;
 import com.galeriaseleta.model.Produto;
 import com.galeriaseleta.repository.CategoriaRepository;
+import com.galeriaseleta.repository.FotoProdutoRepository;
 import com.galeriaseleta.repository.ProdutoRepository;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +15,13 @@ public class ProdutoService {
 
     private final ProdutoRepository produtoRepository;
     private final CategoriaRepository categoriaRepository;
+    private final FotoProdutoRepository fotoProdutoRepository;
 
-    public ProdutoService(ProdutoRepository produtoRepository, CategoriaRepository categoriaRepository) {
+    public ProdutoService(ProdutoRepository produtoRepository, CategoriaRepository categoriaRepository,
+                          FotoProdutoRepository fotoProdutoRepository) {
         this.produtoRepository = produtoRepository;
         this.categoriaRepository = categoriaRepository;
+        this.fotoProdutoRepository = fotoProdutoRepository;
     }
 
     public List<Produto> listarTodos() {
@@ -64,7 +69,20 @@ public class ProdutoService {
         return produtoRepository.save(produto);
     }
 
+    public FotoProduto setPrincipalFoto(Long produtoId, String url) {
+        Produto produto = buscarPorId(produtoId);
+        fotoProdutoRepository.deleteAll(produto.getFotos());
+        FotoProduto foto = new FotoProduto();
+        foto.setProduto(produto);
+        foto.setUrl(url);
+        foto.setPrincipal(true);
+        foto.setOrdem(0);
+        return fotoProdutoRepository.save(foto);
+    }
+
     public void deletar(Long id) {
+        Produto produto = buscarPorId(id);
+        fotoProdutoRepository.deleteAll(produto.getFotos());
         produtoRepository.deleteById(id.intValue());
     }
 

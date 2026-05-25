@@ -6,6 +6,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
   email      TEXT    NOT NULL UNIQUE,
   senha      TEXT    NOT NULL,
   telefone   TEXT,
+  cpf        TEXT,
+  papel      TEXT    NOT NULL DEFAULT 'cliente',
   criado_em  TEXT    DEFAULT (datetime('now'))
 );
 
@@ -64,10 +66,11 @@ CREATE TABLE IF NOT EXISTS opcoes_frete (
 );
 
 CREATE TABLE IF NOT EXISTS carrinho (
-  carrinho_id  INTEGER PRIMARY KEY AUTOINCREMENT,
-  usuario_id   INTEGER NOT NULL REFERENCES usuarios(usuario_id),
-  produto_id   INTEGER NOT NULL REFERENCES produtos(produto_id),
-  adicionado_em TEXT   DEFAULT (datetime('now'))
+  carrinho_id   INTEGER PRIMARY KEY AUTOINCREMENT,
+  usuario_id    INTEGER NOT NULL REFERENCES usuarios(usuario_id),
+  produto_id    INTEGER NOT NULL REFERENCES produtos(produto_id),
+  quantidade    INTEGER NOT NULL DEFAULT 1,
+  adicionado_em TEXT    DEFAULT (datetime('now'))
 );
 
 CREATE TABLE IF NOT EXISTS pedidos (
@@ -88,6 +91,7 @@ CREATE TABLE IF NOT EXISTS itens_pedido (
   item_id    INTEGER PRIMARY KEY AUTOINCREMENT,
   pedido_id  INTEGER NOT NULL REFERENCES pedidos(pedido_id),
   produto_id INTEGER NOT NULL REFERENCES produtos(produto_id),
+  quantidade INTEGER NOT NULL DEFAULT 1,
   preco_pago REAL    NOT NULL
 );
 

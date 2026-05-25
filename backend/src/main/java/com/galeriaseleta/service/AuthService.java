@@ -49,6 +49,7 @@ public class AuthService {
         usuario.setEmail(request.getEmail());
         usuario.setSenha(passwordEncoder.encode(request.getSenha()));
         usuario.setTelefone(request.getTelefone());
+        usuario.setCpf(request.getCpf());
 
         return buildAuthResponse(usuarioRepository.save(usuario));
     }

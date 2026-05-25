@@ -1,0 +1,25 @@
+# Banco de dados local
+*.db
+*.db-shm
+*.db-wal
+
+# Variáveis de ambiente
+.env
+.env.local
+.env.*
+
+# Node
+node_modules/
+frontend/.angular/
+
+# Maven
+backend/target/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db

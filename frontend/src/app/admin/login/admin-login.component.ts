@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AdminAuthService } from '../services/admin-auth.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-admin-login',
@@ -12,13 +12,16 @@ import { AdminAuthService } from '../services/admin-auth.service';
   styleUrls: ['./admin-login.component.css']
 })
 export class AdminLoginComponent {
-  email = '';
-  senha = '';
-  loading = signal(false);
-  erro = signal('');
+  email        = '';
+  senha        = '';
+  loading      = signal(false);
+  erro         = signal('');
   mostrarSenha = signal(false);
 
-  constructor(private auth: AdminAuthService, private router: Router) {}
+  constructor(
+    private auth: AuthService,
+    private router: Router
+  ) {}
 
   login() {
     if (!this.email || !this.senha) {
@@ -28,14 +31,15 @@ export class AdminLoginComponent {
     this.loading.set(true);
     this.erro.set('');
 
-    setTimeout(() => {
-      const result = this.auth.login(this.email, this.senha);
-      this.loading.set(false);
-      if (result.success) {
+    this.auth.login({ email: this.email, senha: this.senha }).subscribe({
+      next: () => {
+        this.loading.set(false);
         this.router.navigate(['/admin/dashboard']);
-      } else {
-        this.erro.set(result.message);
+      },
+      error: (err) => {
+        this.loading.set(false);
+        this.erro.set(err.error?.erro ?? 'Email ou senha incorretos.');
       }
-    }, 800);
+    });
   }
 }

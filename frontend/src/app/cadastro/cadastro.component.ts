@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
+import { AuthService } from '../core/services/auth.service';
 
 interface FormCadastro {
   nome: string;
@@ -23,7 +24,6 @@ interface FormCadastro {
 })
 export class CadastroComponent {
 
-  /* ── Dados do formulário ── */
   form: FormCadastro = {
     nome: '',
     sobrenome: '',
@@ -35,45 +35,29 @@ export class CadastroComponent {
     aceitaTermos: false
   };
 
-  /* ── Visibilidade das senhas ── */
-  mostrarSenha = false;
+  mostrarSenha     = false;
   mostrarConfirmar = false;
 
-  /* ── Campos tocados (validação on blur) ── */
-  nomeTocado = false;
+  nomeTocado      = false;
   sobrenomeTocado = false;
-  emailTocado = false;
-  senhaTocada = false;
+  emailTocado     = false;
+  senhaTocada     = false;
   confirmarTocada = false;
 
-  /* ── Estado de envio ── */
-  carregando = false;
+  carregando      = false;
   mensagemSucesso = '';
-  mensagemErro = '';
+  mensagemErro    = '';
 
-  /* ══════════════════════════════════════════════
-     GETTERS DE VALIDAÇÃO
-  ══════════════════════════════════════════════ */
+  constructor(
+    private router: Router,
+    private auth: AuthService
+  ) {}
 
-  get nomeValido(): boolean {
-    return this.form.nome.trim().length > 0;
-  }
-
-  get sobrenomeValido(): boolean {
-    return this.form.sobrenome.trim().length > 0;
-  }
-
-  get emailValido(): boolean {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.form.email);
-  }
-
-  get senhaValida(): boolean {
-    return this.form.senha.length >= 8;
-  }
-
-  get senhasIguais(): boolean {
-    return this.form.senha === this.form.confirmarSenha && this.form.confirmarSenha.length > 0;
-  }
+  get nomeValido(): boolean     { return this.form.nome.trim().length > 0; }
+  get sobrenomeValido(): boolean { return this.form.sobrenome.trim().length > 0; }
+  get emailValido(): boolean    { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.form.email); }
+  get senhaValida(): boolean    { return this.form.senha.length >= 8; }
+  get senhasIguais(): boolean   { return this.form.senha === this.form.confirmarSenha && this.form.confirmarSenha.length > 0; }
 
   get forcaSenha(): number {
     const s = this.form.senha;
@@ -89,19 +73,9 @@ export class CadastroComponent {
   }
 
   get formularioValido(): boolean {
-    return (
-      this.nomeValido &&
-      this.sobrenomeValido &&
-      this.emailValido &&
-      this.senhaValida &&
-      this.senhasIguais &&
-      this.form.aceitaTermos
-    );
+    return this.nomeValido && this.sobrenomeValido && this.emailValido &&
+           this.senhaValida && this.senhasIguais && this.form.aceitaTermos;
   }
-
-  /* ══════════════════════════════════════════════
-     MÁSCARAS
-  ══════════════════════════════════════════════ */
 
   formatarCpf(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -123,10 +97,6 @@ export class CadastroComponent {
     input.value = v;
   }
 
-  /* ══════════════════════════════════════════════
-     ENVIO
-  ══════════════════════════════════════════════ */
-
   onSubmit(): void {
     this.nomeTocado = true;
     this.sobrenomeTocado = true;
@@ -143,11 +113,23 @@ export class CadastroComponent {
 
     this.carregando = true;
 
-    /* Substituir pelo serviço real de autenticação */
-    setTimeout(() => {
-      this.carregando = false;
-      this.mensagemSucesso = 'Conta criada com sucesso! Bem-vindo(a) à Galeria Seleta.';
-      /* Em produção: this.router.navigate(['/']) */
-    }, 1800);
+    const nomeCompleto = `${this.form.nome.trim()} ${this.form.sobrenome.trim()}`;
+
+    this.auth.registrar({
+      nome: nomeCompleto,
+      email: this.form.email,
+      senha: this.form.senha,
+      telefone: this.form.telefone || undefined,
+      cpf: this.form.cpf || undefined
+    }).subscribe({
+      next: () => {
+        this.carregando = false;
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        this.carregando = false;
+        this.mensagemErro = err.error?.erro ?? 'Erro ao criar conta. Tente novamente.';
+      }
+    });
   }
 }

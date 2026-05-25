@@ -9,6 +9,8 @@ public class UsuarioResponse {
     private String nome;
     private String email;
     private String telefone;
+    private String cpf;
+    private String papel;
     private LocalDateTime criadoEm;
 
     public static UsuarioResponse from(Usuario usuario) {
@@ -17,6 +19,8 @@ public class UsuarioResponse {
         dto.nome = usuario.getNome();
         dto.email = usuario.getEmail();
         dto.telefone = usuario.getTelefone();
+        dto.cpf = usuario.getCpf();
+        dto.papel = usuario.getPapel();
         dto.criadoEm = usuario.getCriadoEm();
         return dto;
     }
@@ -25,5 +29,7 @@ public class UsuarioResponse {
     public String getNome() { return nome; }
     public String getEmail() { return email; }
     public String getTelefone() { return telefone; }
+    public String getCpf() { return cpf; }
+    public String getPapel() { return papel; }
     public LocalDateTime getCriadoEm() { return criadoEm; }
 }

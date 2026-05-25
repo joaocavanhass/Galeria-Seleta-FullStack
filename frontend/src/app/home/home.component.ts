@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core
 import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Produto } from '../core/models/produto.model';
-import { PRODUTOS_MOCK } from '../core/mocks/produtos.mock';
+import { ProdutoService } from '../core/services/produto.service';
 
 export interface SlideHero {
   id: number;
@@ -19,9 +19,11 @@ export interface SlideHero {
 })
 export class HomeComponent implements OnInit, OnDestroy {
 
-  constructor(@Inject(PLATFORM_ID) private platformId: object) {}
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: object,
+    private produtoService: ProdutoService
+  ) {}
 
-  // ── Carrossel Hero ──────────────────────────────────────────
   slides: SlideHero[] = [
     { id: 1, url: 'https://images.unsplash.com/photo-1595175131388-65cd0200facb?auto=format&fit=crop&w=800&q=80', alt: 'Coleção primavera' },
     { id: 2, url: 'https://images.unsplash.com/photo-1590664325935-68aba5254108?auto=format&fit=crop&w=800&q=80', alt: 'Peças exclusivas' },
@@ -30,19 +32,18 @@ export class HomeComponent implements OnInit, OnDestroy {
   currentSlide = 0;
   private autoplayTimer: ReturnType<typeof setInterval> | null = null;
 
-  // ── Marquee Novidades ────────────────────────────────────────
-  produtosNovidades: Produto[] = PRODUTOS_MOCK
-    .filter((p: Produto) => p.status === 'ativo')
-    .sort((a: Produto, b: Produto) => new Date(b.criado_em).getTime() - new Date(a.criado_em).getTime())
-    .slice(0, 8);
+  produtosNovidades: Produto[] = [];
 
   get produtosMarquee(): Produto[] {
     return [...this.produtosNovidades, ...this.produtosNovidades];
   }
 
-  // ── Lifecycle ────────────────────────────────────────────────
   ngOnInit(): void {
-    // Autoplay apenas no browser — evita travar o prerender SSR
+    this.produtoService.novidades().subscribe({
+      next: (lista) => { this.produtosNovidades = lista.slice(0, 8); },
+      error: () => { this.produtosNovidades = []; }
+    });
+
     if (isPlatformBrowser(this.platformId)) {
       this.iniciarAutoplay();
     }
@@ -52,7 +53,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.pararAutoplay();
   }
 
-  // ── Métodos do Carrossel ─────────────────────────────────────
   iniciarAutoplay(): void {
     this.autoplayTimer = setInterval(() => this.proximo(), 4000);
   }
@@ -64,24 +64,10 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
-  proximo(): void {
-    this.currentSlide = (this.currentSlide + 1) % this.slides.length;
-  }
+  proximo(): void  { this.currentSlide = (this.currentSlide + 1) % this.slides.length; }
+  anterior(): void { this.currentSlide = (this.currentSlide - 1 + this.slides.length) % this.slides.length; }
+  irPara(index: number): void { this.currentSlide = index; }
 
-  anterior(): void {
-    this.currentSlide = (this.currentSlide - 1 + this.slides.length) % this.slides.length;
-  }
-
-  irPara(index: number): void {
-    this.currentSlide = index;
-  }
-
-  // ── Helpers ──────────────────────────────────────────────────
-  precoFinal(p: Produto): number {
-    return p.preco_desconto ?? p.preco;
-  }
-
-  temDesconto(p: Produto): boolean {
-    return p.preco_desconto !== null && p.preco_desconto < p.preco;
-  }
+  precoFinal(p: Produto): number  { return p.preco_desconto ?? p.preco; }
+  temDesconto(p: Produto): boolean { return p.preco_desconto !== null && p.preco_desconto! < p.preco; }
 }
