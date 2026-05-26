@@ -1,7 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
+
+interface PaginatedResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
 
 export interface ItemPedidoApi {
   id: number;
@@ -42,7 +50,9 @@ export class PedidoService {
   listar(status?: string): Observable<PedidoApi[]> {
     let params = new HttpParams();
     if (status) params = params.set('status', status);
-    return this.http.get<PedidoApi[]>(this.base, { params });
+    return this.http.get<PaginatedResponse<PedidoApi> | PedidoApi[]>(this.base, { params }).pipe(
+      map(res => Array.isArray(res) ? res : res.content)
+    );
   }
 
   buscarPorId(id: number): Observable<PedidoApi> {
