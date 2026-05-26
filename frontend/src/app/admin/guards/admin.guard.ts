@@ -12,11 +12,9 @@ export const adminGuard: CanActivateFn = () => {
     return true;
   }
 
-  // Usuário logado mas não é admin → vai para a loja
   if (usuario) {
     return router.createUrlTree(['/']);
   }
 
-  // Não logado → vai para login
-  return router.createUrlTree(['/login']);
+  return router.createUrlTree(['/admin/login']);
 };

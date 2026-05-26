@@ -5,8 +5,10 @@ import { AdminDashboardComponent } from './dashboard/admin-dashboard.component';
 import { AdminUsuariosComponent } from './usuarios/admin-usuarios.component';
 import { AdminProdutosComponent } from './produtos/admin-produtos.component';
 import { AdminPedidosComponent } from './pedidos/admin-pedidos.component';
+import { AdminLoginComponent } from './login/admin-login.component';
 
 export const adminRoutes: Routes = [
+  { path: 'login', component: AdminLoginComponent },
   {
     path: '',
     component: AdminLayoutComponent,
