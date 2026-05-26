@@ -15,22 +15,29 @@ export class CarrinhoComponent {
 
   readonly srv = inject(CarrinhoService);
 
-  cupomInput = '';
-  cupomErro  = false;
-  cupomOk    = false;
+  cupomInput    = '';
+  cupomErro     = false;
+  cupomOk       = false;
+  cupomCarregando = false;
 
   get itens()    { return this.srv.itens(); }
   get subtotal() { return this.srv.subtotal(); }
   get desconto() { return this.srv.desconto(); }
   get total()    { return this.srv.total(); }
 
-  aumentarQtd(id: number, tamanho?: string)  { this.srv.aumentarQtd(id, tamanho); }
-  diminuirQtd(id: number, tamanho?: string)  { this.srv.diminuirQtd(id, tamanho); }
-  removerItem(id: number, tamanho?: string)  { this.srv.removerItem(id, tamanho); }
+  aumentarQtd(id: number, tamanho?: string) { this.srv.aumentarQtd(id, tamanho); }
+  diminuirQtd(id: number, tamanho?: string) { this.srv.diminuirQtd(id, tamanho); }
+  removerItem(id: number, tamanho?: string) { this.srv.removerItem(id, tamanho); }
 
-  aplicarCupom() {
-    const ok = this.srv.aplicarCupom(this.cupomInput);
-    this.cupomOk   = ok;
-    this.cupomErro = !ok;
+  async aplicarCupom() {
+    if (!this.cupomInput.trim()) return;
+    this.cupomCarregando = true;
+    this.cupomErro       = false;
+    this.cupomOk         = false;
+
+    const ok = await this.srv.aplicarCupomApi(this.cupomInput);
+    this.cupomOk         = ok;
+    this.cupomErro       = !ok;
+    this.cupomCarregando = false;
   }
 }

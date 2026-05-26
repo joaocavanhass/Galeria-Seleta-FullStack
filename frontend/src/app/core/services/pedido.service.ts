@@ -13,7 +13,7 @@ interface PaginatedResponse<T> {
 
 export interface ItemPedidoApi {
   id: number;
-  produto: { id: number; nome: string; preco: number };
+  produto?: { id: number; nome: string; preco: number } | null;
   quantidade: number;
   precoPago: number;
 }
@@ -26,8 +26,8 @@ export interface PedidoApi {
   desconto: number;
   total: number;
   criadoEm: string;
-  usuario: { id: number; nome: string; email: string };
-  endereco: { id: number; rua: string; cidade: string; estado: string; cep: string };
+  usuario?: { id: number; nome: string; email: string } | null;
+  endereco?: { id: number; rua: string; cidade: string; estado: string; cep: string } | null;
   itens: ItemPedidoApi[];
   cupom?: { id: number; codigo: string };
   frete?: { id: number; nome: string; preco: number };

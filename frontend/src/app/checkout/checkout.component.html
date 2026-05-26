@@ -24,7 +24,7 @@
     <div class="checkout-hero__sep"></div>
   </div>
 
- 
+
   @if (step() !== 3) {
     <div class="steps">
       <div class="step" [class.step--ativo]="step() === 1" [class.step--feito]="step() > 1">
@@ -82,23 +82,33 @@
             @for (op of freteOpcoes; track op.id) {
               <label
                 class="frete-item"
-                [class.frete-item--ativo]="freteSelecionado() === op.id"
-                (click)="selecionarFrete(op.id)"
+                [class.frete-item--ativo]="freteSelecionado()?.id === op.id && !freteRetirada()"
+                (click)="selecionarFrete(op)"
               >
                 <div class="frete-item__dados">
-                  <span class="frete-item__nome">{{ op.label }}</span>
-                  <span class="frete-item__prazo">{{ op.prazo }}</span>
+                  <span class="frete-item__nome">{{ op.nome }}</span>
+                  <span class="frete-item__prazo">{{ prazoLabel(op) }}</span>
                 </div>
                 <div class="frete-item__direita">
-                  @if (op.preco === null) {
-                    <span class="frete-item__preco frete-item__preco--gratis">Grátis</span>
-                  } @else {
-                    <span class="frete-item__preco">{{ op.preco | currency:'BRL' }}</span>
-                  }
-                  <input type="radio" name="frete" [value]="op.id" [checked]="freteSelecionado() === op.id" (change)="selecionarFrete(op.id)" />
+                  <span class="frete-item__preco">{{ op.preco | currency:'BRL' }}</span>
+                  <input type="radio" name="frete" [value]="op.id" [checked]="freteSelecionado()?.id === op.id && !freteRetirada()" (change)="selecionarFrete(op)" />
                 </div>
               </label>
             }
+            <label
+              class="frete-item"
+              [class.frete-item--ativo]="freteRetirada()"
+              (click)="selecionarRetirada()"
+            >
+              <div class="frete-item__dados">
+                <span class="frete-item__nome">Retirada na loja</span>
+                <span class="frete-item__prazo">1 – 2 dias</span>
+              </div>
+              <div class="frete-item__direita">
+                <span class="frete-item__preco frete-item__preco--gratis">Grátis</span>
+                <input type="radio" name="frete" [checked]="freteRetirada()" (change)="selecionarRetirada()" />
+              </div>
+            </label>
           </div>
         </section>
 
@@ -129,7 +139,6 @@
         <section class="bloco resumo">
           <h2 class="bloco__titulo">Resumo do pedido</h2>
 
-          <!-- Itens do carrinho -->
           <div class="resumo-itens">
             @for (item of itens; track item.id) {
               <div class="resumo-item">
@@ -325,17 +334,14 @@
         </svg>
       </div>
 
-   
       <h2 class="sucesso-titulo">Pagamento realizado com sucesso</h2>
       <p class="sucesso-sub">Muito obrigado por escolher a Galeria Seleta!</p>
 
-    
       <div class="sucesso-pedido">
         <span class="sucesso-pedido__label">Pedido</span>
         <span class="sucesso-pedido__num">#{{ numeroPedido() }}</span>
       </div>
 
-  
       <div class="sucesso-acoes">
         <button class="btn-sucesso btn-sucesso--sec" (click)="irParaPedidos()">
           Acompanhar pedido
