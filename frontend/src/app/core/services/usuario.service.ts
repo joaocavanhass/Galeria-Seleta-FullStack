@@ -1,7 +1,16 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+
+interface PageResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
 
 export interface EnderecoApi {
   id: number;
@@ -37,7 +46,9 @@ export class UsuarioService {
   constructor(private http: HttpClient) {}
 
   listarTodos(): Observable<PerfilApi[]> {
-    return this.http.get<PerfilApi[]>(this.base);
+    return this.http.get<PageResponse<PerfilApi>>(this.base).pipe(
+      map(res => res.content)
+    );
   }
 
   atualizarPapel(id: number, papel: string): Observable<PerfilApi> {
