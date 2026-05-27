@@ -50,20 +50,6 @@
         }
       </div>
 
-      <!-- CUPOM -->
-      <div class="coupon-area">
-        <input
-          type="text"
-          placeholder="Cupom de desconto"
-          [(ngModel)]="cupomInput">
-        <button (click)="aplicarCupom()">Aplicar</button>
-      </div>
-      @if (cupomOk) {
-        <p class="cupom-msg cupom-msg--ok">✓ Cupom aplicado com sucesso!</p>
-      }
-      @if (cupomErro) {
-        <p class="cupom-msg cupom-msg--erro">Cupom inválido.</p>
-      }
 
       <!-- RESUMO -->
       <div class="summary">

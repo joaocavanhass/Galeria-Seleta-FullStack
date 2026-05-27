@@ -76,6 +76,16 @@ export class AuthService {
     return this.currentUser() !== null;
   }
 
+  patchUsuario(dados: Partial<UsuarioLogado>): void {
+    const atual = this.currentUser();
+    if (!atual) return;
+    const atualizado = { ...atual, ...dados };
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem(this.USER_KEY, JSON.stringify(atualizado));
+    }
+    this.currentUser.set(atualizado);
+  }
+
   private salvarSessao(res: AuthResponse): void {
     if (isPlatformBrowser(this.platformId)) {
       localStorage.setItem(this.TOKEN_KEY,   res.accessToken);

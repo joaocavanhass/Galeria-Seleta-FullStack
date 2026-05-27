@@ -1011,48 +1011,383 @@
     }
   }
 }
-/* ── Itens do carrinho no resumo ─────────────────── */
-.resumo-itens {
+
+/* ════════════════════════════════════════════════════════════
+   ENDEREÇO — TOGGLE
+════════════════════════════════════════════════════════════ */
+.endereco-toggle {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-bottom: 16px;
 }
 
-.resumo-item {
+.endereco-opcao {
+  border: 1px solid var(--cor-borda);
+  border-radius: 6px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+
+  &--ativa {
+    border-color: var(--cor-acento);
+    border-left: 3px solid var(--cor-acento);
+    background: var(--cor-acento-dim);
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__label {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--cor-texto);
+    letter-spacing: 0.04em;
+  }
+
+  &__detalhe {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--cor-texto-muted);
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+
+  input[type="radio"] {
+    accent-color: var(--cor-acento);
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   ENDEREÇO — FORMULÁRIO
+════════════════════════════════════════════════════════════ */
+.endereco-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--cor-borda);
+  animation: fadeUp 0.3s ease both;
+
+  &__row {
+    display: flex;
+    gap: 12px;
+  }
+
+  &__campo {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+
+    &--cep  { max-width: 160px; }
+    &--rua  { flex: 1; }
+    &--uf   { max-width: 64px; }
+  }
+}
+
+.campo-label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cor-texto-muted);
+}
+
+.campo-opcional {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 10px;
+}
+
+.campo-input {
+  background: var(--cor-superficie-2);
+  border: 1px solid var(--cor-borda);
+  border-radius: 4px;
+  padding: 10px 12px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--cor-texto);
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+
+  &::placeholder { color: var(--cor-texto-muted); }
+  &:focus { border-color: var(--cor-acento); }
+
+  &--erro { border-color: #e8441a; }
+}
+
+
+/* CEP loading */
+.campo-cep-loading {
+  font-weight: 400;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--cor-acento);
+  text-transform: none;
+  margin-left: 6px;
+  animation: pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  from { opacity: 0.4; }
+  to   { opacity: 1; }
+}
+
+.campo-erro-msg {
+  font-family: var(--font-body);
+  font-size: 10px;
+  color: var(--cor-acento);
+  margin-top: 3px;
+}
+
+
+
+/* Botão confirmar desabilitado */
+.btn-confirmar:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ════════════════════════════════════════════════════════════
+   ENDEREÇO — TOGGLE + FORMULÁRIO
+════════════════════════════════════════════════════════════ */
+.bloco-loading {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--cor-texto-muted);
+  padding: 8px 0;
+}
+
+.erro-checkout {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--cor-acento);
+  margin-top: 10px;
+}
+
+.endereco-toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.endereco-opcao {
+  border: 1px solid var(--cor-borda);
+  border-radius: 6px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+
+  &--ativa {
+    border-left: 3px solid var(--cor-acento);
+    background: var(--cor-acento-dim);
+    border-color: var(--cor-acento);
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--cor-texto);
+  }
+
+  &__tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--cor-acento);
+    background: var(--cor-acento-dim);
+    border: 1px solid var(--cor-acento);
+    border-radius: 3px;
+    padding: 1px 6px;
+  }
+
+  &__detalhe {
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: var(--cor-texto-muted);
+    margin-top: 5px;
+  }
+
+  input[type="radio"] {
+    accent-color: var(--cor-acento);
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+}
+
+/* Formulário ViaCEP */
+.endereco-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--cor-borda);
+  animation: fadeUp 0.3s ease both;
+
+  &__row {
+    display: flex;
+    gap: 12px;
+  }
+
+  &__campo {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+
+    &--cep { max-width: 150px; }
+    &--uf  { max-width: 60px; }
+  }
+}
+
+.campo-label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cor-texto-muted);
+}
+
+.campo-opcional {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.campo-input {
+  background: var(--cor-superficie-2);
+  border: 1px solid var(--cor-borda);
+  border-radius: 4px;
+  padding: 10px 12px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--cor-texto);
+  outline: none;
+  width: 100%;
+  transition: border-color 0.2s;
+
+  &::placeholder { color: var(--cor-texto-muted); }
+  &:focus { border-color: var(--cor-acento); }
+  &--erro { border-color: var(--cor-acento); }
+}
+
+
+
+
+
+.btn-cancelar-endereco {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--cor-texto-muted);
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  transition: color 0.2s;
+
+  &:hover { color: var(--cor-texto); }
+}
+
+.btn-editar-inline {
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: var(--cor-texto-muted);
+  cursor: pointer;
+  padding: 2px 5px;
+  border-radius: 3px;
+  transition: color 0.2s, background 0.2s;
+  flex-shrink: 0;
+  line-height: 1;
+
+  &:hover {
+    color: var(--cor-acento);
+    background: var(--cor-acento-dim);
+  }
+}
+
+.endereco-opcao__acoes {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
 }
 
-.resumo-item__img {
-  width: 52px;
-  height: 52px;
-  object-fit: cover;
-  border-radius: 4px;
-  flex-shrink: 0;
-}
-
-.resumo-item__info {
-  flex: 1;
+.tel-edit-row {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
 }
 
-.resumo-item__nome {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #111;
+.tel-input {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 13px;
 }
 
-.resumo-item__detalhe {
-  font-size: 0.75rem;
-  color: #888;
-}
-
-.resumo-item__preco {
-  font-size: 0.85rem;
-  font-weight: 600;
+.btn-tel-ok {
+  background: var(--cor-acento);
+  border: none;
+  border-radius: 4px;
+  padding: 6px 14px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--cor-fundo);
+  cursor: pointer;
   white-space: nowrap;
+  transition: opacity 0.2s;
+
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+}
+
+.btn-add-endereco {
+  background: none;
+  border: 1px dashed var(--cor-borda);
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--cor-texto-muted);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+  width: 100%;
+
+  &:hover {
+    border-color: var(--cor-acento);
+    color: var(--cor-acento);
+  }
 }

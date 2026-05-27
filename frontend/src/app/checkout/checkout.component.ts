@@ -1,12 +1,20 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { CarrinhoService } from '../core/services/carrinho.service';
 import { PedidoService, PedidoApi } from '../core/services/pedido.service';
 import { UsuarioService, EnderecoApi } from '../core/services/usuario.service';
 import { AuthService } from '../core/services/auth.service';
 import { FreteService, FreteApi } from '../core/services/frete.service';
+
+interface ViaCepResponse {
+  logradouro?: string;
+  localidade?: string;
+  uf?: string;
+  erro?: boolean;
+}
 
 export type PagtoId = 'cartao' | 'pix' | 'dinheiro' | 'boleto';
 
@@ -27,6 +35,7 @@ export interface PagtoOpcao {
 export class CheckoutComponent implements OnInit {
 
   private router         = inject(Router);
+  private http           = inject(HttpClient);
   private auth           = inject(AuthService);
   private pedidoService  = inject(PedidoService);
   private usuarioService = inject(UsuarioService);
@@ -38,6 +47,18 @@ export class CheckoutComponent implements OnInit {
   carregandoEnderecos = signal(true);
   erroCheckout        = signal('');
   pedidoCriado        = signal<PedidoApi | null>(null);
+
+  mostrarFormEndereco = signal(false);
+  salvandoEndereco    = signal(false);
+  buscandoCep         = signal(false);
+  erroEndereco        = signal('');
+  erroCep             = signal('');
+  enderecoEditandoId  = signal<number | null>(null);
+  novoEndereco        = { rua: '', cidade: '', estado: '', cep: '' };
+
+  editandoTelefone  = signal(false);
+  salvandoTelefone  = signal(false);
+  novoTelefone      = '';
 
   // Fretes como array simples (não signal) para compatibilidade com @for no template
   freteOpcoes: FreteApi[] = [];
@@ -65,8 +86,9 @@ export class CheckoutComponent implements OnInit {
         const principal = lista.find(e => e.principal) ?? lista[0] ?? null;
         this.enderecoSelecionado.set(principal);
         this.carregandoEnderecos.set(false);
+        if (lista.length === 0) this.mostrarFormEndereco.set(true);
       },
-      error: () => { this.carregandoEnderecos.set(false); }
+      error: () => { this.carregandoEnderecos.set(false); this.mostrarFormEndereco.set(true); }
     });
 
     // Carrega opções de frete da API
@@ -121,6 +143,126 @@ export class CheckoutComponent implements OnInit {
   selecionarRetirada()               { this.freteRetirada.set(true); this.freteSelecionado.set(null); }
   selecionarPagto(id: PagtoId)       { this.pagtoSelecionado.set(id); }
   selecionarEndereco(e: EnderecoApi) { this.enderecoSelecionado.set(e); }
+
+  salvarEndereco(): void {
+    const { rua, cidade, cep } = this.novoEndereco;
+    const estado = this.novoEndereco.estado.toUpperCase();
+    if (!rua || !cidade || !estado || !cep) {
+      this.erroEndereco.set('Preencha todos os campos do endereço.');
+      return;
+    }
+    this.erroEndereco.set('');
+    this.salvandoEndereco.set(true);
+
+    const editandoId = this.enderecoEditandoId();
+    if (editandoId !== null) {
+      const antigo = this.enderecos().find(e => e.id === editandoId);
+      const ePrincipal = antigo?.principal ?? false;
+      this.usuarioService.removerEndereco(editandoId).subscribe({
+        next: () => {
+          this.enderecos.update(l => l.filter(e => e.id !== editandoId));
+          this.criarEndereco(rua, cidade, estado, cep, ePrincipal);
+        },
+        error: () => {
+          this.erroEndereco.set('Erro ao atualizar endereço. Tente novamente.');
+          this.salvandoEndereco.set(false);
+        }
+      });
+    } else {
+      const ePrincipal = this.enderecos().length === 0;
+      this.criarEndereco(rua, cidade, estado, cep, ePrincipal);
+    }
+  }
+
+  private criarEndereco(rua: string, cidade: string, estado: string, cep: string, principal: boolean): void {
+    this.usuarioService.adicionarEndereco({ rua, cidade, estado, cep, principal }).subscribe({
+      next: (end) => {
+        this.enderecos.update(l => [...l, end]);
+        this.enderecoSelecionado.set(end);
+        this.mostrarFormEndereco.set(false);
+        this.salvandoEndereco.set(false);
+        this.enderecoEditandoId.set(null);
+        this.novoEndereco = { rua: '', cidade: '', estado: '', cep: '' };
+      },
+      error: () => {
+        this.erroEndereco.set('Erro ao salvar endereço. Tente novamente.');
+        this.salvandoEndereco.set(false);
+      }
+    });
+  }
+
+  editarEndereco(e: EnderecoApi): void {
+    this.novoEndereco = { rua: e.rua, cidade: e.cidade, estado: e.estado, cep: e.cep };
+    this.enderecoEditandoId.set(e.id);
+    this.mostrarFormEndereco.set(true);
+    this.erroEndereco.set('');
+    this.erroCep.set('');
+  }
+
+  cancelarNovoEndereco(): void {
+    this.mostrarFormEndereco.set(false);
+    this.erroEndereco.set('');
+    this.erroCep.set('');
+    this.enderecoEditandoId.set(null);
+    this.novoEndereco = { rua: '', cidade: '', estado: '', cep: '' };
+  }
+
+  iniciarEditarTelefone(): void {
+    this.novoTelefone = this.auth.currentUser()?.telefone ?? '';
+    this.editandoTelefone.set(true);
+  }
+
+  cancelarEditarTelefone(): void {
+    this.editandoTelefone.set(false);
+    this.novoTelefone = '';
+  }
+
+  salvarTelefone(): void {
+    const tel = this.novoTelefone.trim();
+    if (!tel) return;
+    this.salvandoTelefone.set(true);
+    this.usuarioService.atualizar({ telefone: tel }).subscribe({
+      next: () => {
+        this.auth.patchUsuario({ telefone: tel });
+        this.editandoTelefone.set(false);
+        this.salvandoTelefone.set(false);
+        this.novoTelefone = '';
+      },
+      error: () => { this.salvandoTelefone.set(false); }
+    });
+  }
+
+  formatarCep(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    let v = input.value.replace(/\D/g, '').slice(0, 8);
+    if (v.length > 5) v = `${v.slice(0, 5)}-${v.slice(5)}`;
+    this.novoEndereco.cep = v;
+    input.value = v;
+    this.erroCep.set('');
+  }
+
+  buscarCep(): void {
+    const cep = this.novoEndereco.cep.replace(/\D/g, '');
+    if (cep.length !== 8) return;
+    this.buscandoCep.set(true);
+    this.erroCep.set('');
+    this.http.get<ViaCepResponse>(`https://viacep.com.br/ws/${cep}/json/`).subscribe({
+      next: (dados) => {
+        this.buscandoCep.set(false);
+        if (dados.erro) {
+          this.erroCep.set('CEP não encontrado.');
+          return;
+        }
+        if (dados.logradouro) this.novoEndereco.rua    = dados.logradouro;
+        if (dados.localidade) this.novoEndereco.cidade = dados.localidade;
+        if (dados.uf)         this.novoEndereco.estado = dados.uf;
+      },
+      error: () => {
+        this.buscandoCep.set(false);
+        this.erroCep.set('Erro ao buscar CEP. Verifique sua conexão.');
+      }
+    });
+  }
 
   prazoLabel(f: FreteApi): string {
     return `${f.prazoMinimo} – ${f.prazoMaximo} dias`;

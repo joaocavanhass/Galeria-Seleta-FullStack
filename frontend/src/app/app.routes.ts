@@ -20,7 +20,7 @@ export const routes: Routes = [
   { path: 'produtos',      component: ProdutosComponent        },
   { path: 'produtos/:id',  component: ProdutoDetalhesComponent },
   { path: 'carrinho',      component: CarrinhoComponent        },
-  { path: 'checkout',      component: CheckoutComponent,      canActivate: [authGuard] },
+  { path: 'checkout',      component: CheckoutComponent       },
   { path: 'meus-pedidos',  component: MeusPedidosComponent,   canActivate: [authGuard] },
   {
     path: 'admin',

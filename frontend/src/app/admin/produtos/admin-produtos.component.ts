@@ -52,14 +52,14 @@ export class AdminProdutosComponent implements OnInit {
 
   carregarProdutos(): void {
     this.carregando.set(true);
-    this.produtoService.listar().subscribe({
+    this.produtoService.listar({ status: 'todos' }).subscribe({
       next: (lista) => { this.produtos.set(lista); this.carregando.set(false); },
       error: () => { this.carregando.set(false); }
     });
   }
 
   abrirNovoProduto() {
-    this.produtoEditando.set({ nome: '', descricao: '', preco: 0, status: 'rascunho', categoria: '' });
+    this.produtoEditando.set({ nome: '', descricao: '', preco: 0, status: 'ativo', categoria: '' });
     this.modalAberto.set(true);
   }
 

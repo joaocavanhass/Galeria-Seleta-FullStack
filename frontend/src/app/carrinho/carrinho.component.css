@@ -166,17 +166,6 @@
   font-size: 1.4rem;
   font-weight: 700;
 }
-
-/* CUPOM */
-
-.coupon-area {
-  margin-top: 40px;
-
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
-
 .coupon-area input {
   width: 280px;
 
