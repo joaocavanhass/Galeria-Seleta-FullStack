@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="./admin-produtos.component.css">
+
 <div class="page-produtos">
   <div class="page-header">
     <div>
@@ -136,6 +138,12 @@
         <div class="form-field">
           <label>URL da Imagem</label>
           <input type="text" [(ngModel)]="p.imagem_url" placeholder="https://..." />
+        </div>
+        <div class="form-field full">
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="p.novidade" />
+            <span>Marcar como novidade <em>(aparece no carrossel da página inicial)</em></span>
+          </label>
         </div>
       </div>
       <div *ngIf="erroSalvar()" style="color:#e53935;font-size:.85rem;margin-bottom:.5rem;padding:.5rem .75rem;background:#fff0f0;border-radius:6px;border:1px solid #ffcdd2">

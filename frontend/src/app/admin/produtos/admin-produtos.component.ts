@@ -29,7 +29,7 @@ import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Produto } from '../../core/models/produto.model';
-import { ProdutoService, ApiProduto, ProdutoRequest } from '../../core/services/produto.service';
+import { ProdutoService, ProdutoRequest } from '../../core/services/produto.service';
 import { CategoriaService } from '../../core/services/categoria.service';
 import { Categoria } from '../../core/models/categoria.model';
 
@@ -104,7 +104,7 @@ export class AdminProdutosComponent implements OnInit {
 
   // Abre o modal para criar um novo produto (objeto inicial com valores padrão)
   abrirNovoProduto() {
-    this.produtoEditando.set({ nome: '', descricao: '', preco: 0, status: 'ativo', categoria: '' });
+    this.produtoEditando.set({ nome: '', descricao: '', preco: 0, status: 'ativo', categoria: '', novidade: false });
     this.modalAberto.set(true);
   }
 
@@ -159,7 +159,7 @@ export class AdminProdutosComponent implements OnInit {
       preco: p.preco!,
       // Converte o status do frontend para o formato do backend
       status: p.status === 'ativo' ? 'disponivel' : p.status === 'inativo' ? 'indisponivel' : 'rascunho',
-      novidade: false,
+      novidade: p.novidade ?? false, // Usa o valor do checkbox; false se não informado
       categoriaId: categoria?.id ?? p.categoria_id! // Usa o ID da categoria encontrada ou o existente
     };
 

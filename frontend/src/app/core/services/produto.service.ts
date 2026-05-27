@@ -106,6 +106,7 @@ function mapProduto(api: ApiProduto): Produto {
     preco_desconto: null,           // Backend não tem este campo, usa null
     estoque: 0,                     // Backend não retorna estoque aqui, usa 0
     status: statusFront,
+    novidade: api.novidade ?? false, // true = aparece no carrossel de novidades da home
     criado_em: api.criadoEm,        // camelCase → snake_case
     categoria_id: api.categoria?.id ?? 0,   // Usa 0 se categoria for null
     categoria: api.categoria?.nome ?? '',   // Usa '' se categoria for null

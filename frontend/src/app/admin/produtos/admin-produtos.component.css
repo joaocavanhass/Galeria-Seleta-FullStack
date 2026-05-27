@@ -63,3 +63,17 @@
 .form-field textarea:focus { border-color: #e8441a; }
 .form-field input::placeholder,
 .form-field textarea::placeholder { color: #444; }
+
+/* Checkbox novidade */
+.checkbox-label {
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer; text-transform: none !important;
+  font-size: 13px !important; letter-spacing: 0 !important;
+  font-weight: 500 !important; color: #ccc !important;
+}
+.checkbox-label input[type='checkbox'] {
+  width: 16px; height: 16px; min-width: 16px;
+  accent-color: #e8441a; cursor: pointer;
+  border: none; padding: 0; background: transparent;
+}
+.checkbox-label em { color: #777; font-style: italic; font-size: 11px; }

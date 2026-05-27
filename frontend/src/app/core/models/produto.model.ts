@@ -29,6 +29,7 @@ export interface Produto {
   preco_desconto: number | null;     // Preço com desconto (null = sem desconto)
   estoque: number;                   // Quantidade disponível em estoque
   status: 'ativo' | 'inativo' | 'rascunho'; // Estado de visibilidade do produto
+  novidade: boolean;                 // Indica se o produto aparece no carrossel de novidades
   criado_em: string;                 // Data de criação no formato ISO (string)
   imagens?: ImagemProduto[];         // Lista de fotos do produto (opcional)
   imagem_url?: string;               // URL da imagem principal (calculada pelo service)
