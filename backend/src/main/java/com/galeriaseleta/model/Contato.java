@@ -1,3 +1,13 @@
+// ============================================================
+// ARQUIVO: Contato.java
+// FUNÇÃO: Model que representa a tabela "contatos" no banco.
+// Armazena as mensagens enviadas pelo formulário de contato do site.
+// Qualquer visitante pode enviar uma mensagem sem precisar de conta.
+//
+// CONEXÕES: ContatoController recebe a requisição e chama
+// ContatoService que salva a mensagem usando ContatoRepository.
+// ============================================================
+
 package com.galeriaseleta.model;
 
 import jakarta.persistence.*;
@@ -13,21 +23,24 @@ public class Contato {
     private Integer id;
 
     @Column(nullable = false)
-    private String nome;
+    private String nome; // Primeiro nome de quem enviou
 
-    private String sobrenome;
+    private String sobrenome; // Sobrenome (opcional)
 
     @Column(nullable = false)
-    private String email;
+    private String email; // Email para resposta
 
-    private String telefone;
+    private String telefone; // Telefone (opcional)
 
+    // columnDefinition = "TEXT": permite mensagens longas sem limite de caracteres
     @Column(nullable = false, columnDefinition = "TEXT")
     private String mensagem;
 
+    // Momento em que a mensagem foi recebida — gerado automaticamente
     @Column(name = "recebido_em")
     private LocalDateTime recebidoEm = LocalDateTime.now();
 
+    // Getters e Setters
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
 

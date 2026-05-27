@@ -1,5 +1,28 @@
+// ============================================================
+// ARQUIVO: produtos.mock.ts
+// FUNÇÃO: Dados fictícios (mock) de produtos para uso em desenvolvimento e testes.
+//
+// O QUE SÃO MOCKS?
+// Mocks são dados falsos que imitam exatamente o formato dos dados reais.
+// Eles permitem desenvolver e testar o frontend sem depender da API estar rodando.
+//
+// ESTRUTURA:
+// Cada objeto em PRODUTOS_MOCK segue a interface Produto do modelo.
+// Os campos incluem: id, categoria_id, nome, descricao, preco, preco_desconto,
+// estoque, status, criado_em, imagem_url, categoria e imagens.
+//
+// IMAGENS:
+// As URLs das imagens vêm do Unsplash (banco de imagens gratuitas).
+// Em produção, as imagens viriam do banco de dados do sistema.
+//
+// CONEXÕES: pode ser importado por componentes ou arquivos de teste (.spec.ts).
+// ============================================================
+
+// Importa a interface Produto para garantir tipagem correta dos dados mock
 import { Produto } from '../models/produto.model';
 
+// Array com 8 produtos fictícios representando o catálogo da loja.
+// "export const" = pode ser importado em outros arquivos; nunca deve ser modificado em runtime.
 export const PRODUTOS_MOCK: Produto[] = [
   {
     id: 1,
@@ -7,10 +30,10 @@ export const PRODUTOS_MOCK: Produto[] = [
     nome: 'Moletom Oversized',
     descricao: 'Moletom oversized unissex em algodão pesado com capuz.',
     preco: 189.90,
-    preco_desconto: 149.90,
+    preco_desconto: 149.90,  // Preço com desconto (quando há promoção)
     estoque: 10,
     status: 'ativo',
-    criado_em: '2026-04-01T10:00:00Z',
+    criado_em: '2026-04-01T10:00:00Z', // Formato ISO 8601 de data e hora
     imagem_url: 'https://images.unsplash.com/photo-1499971442178-8c10fdf5f6ac?auto=format&fit=crop&w=600&q=80',
     categoria: 'Moletons',
     imagens: [{ id: 1, produto_id: 1, url: 'https://images.unsplash.com/photo-1499971442178-8c10fdf5f6ac?auto=format&fit=crop&w=600&q=80', principal: true, ordem: 1 }]
@@ -21,7 +44,7 @@ export const PRODUTOS_MOCK: Produto[] = [
     nome: 'Calça Jeans Wide',
     descricao: 'Calça jeans baggy estilo skater, corte largo e confortável.',
     preco: 99.90,
-    preco_desconto: null,
+    preco_desconto: null,  // null = sem desconto ativo
     estoque: 15,
     status: 'ativo',
     criado_em: '2026-04-05T10:00:00Z',

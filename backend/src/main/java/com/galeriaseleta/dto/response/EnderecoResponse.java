@@ -1,3 +1,10 @@
+// ============================================================
+// ARQUIVO: EnderecoResponse.java
+// FUNÇÃO: DTO de saída com os dados de um endereço de entrega.
+// Não inclui o usuário dono do endereço (desnecessário na resposta).
+// Usado na listagem de endereços do perfil e no detalhamento do pedido.
+// ============================================================
+
 package com.galeriaseleta.dto.response;
 
 import com.galeriaseleta.model.Endereco;
@@ -9,7 +16,7 @@ public class EnderecoResponse {
     private String cidade;
     private String estado;
     private String cep;
-    private Boolean principal;
+    private Boolean principal; // true = endereço padrão do usuário
 
     public static EnderecoResponse from(Endereco endereco) {
         EnderecoResponse dto = new EnderecoResponse();

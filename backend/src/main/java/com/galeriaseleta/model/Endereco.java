@@ -1,3 +1,17 @@
+// ============================================================
+// ARQUIVO: Endereco.java
+// FUNÇÃO: Model que representa a tabela "enderecos" no banco.
+// Um usuário pode ter vários endereços cadastrados.
+// Um deles pode ser marcado como "principal" (padrão).
+// No checkout, o usuário escolhe qual endereço usar para entrega.
+//
+// RELACIONAMENTOS:
+// - Endereco → Usuario: ManyToOne (um usuário pode ter vários endereços)
+//
+// CONEXÕES: UsuarioService/UsuarioController gerenciam os endereços do usuário.
+// PedidoService usa o endereço escolhido ao criar o pedido.
+// ============================================================
+
 package com.galeriaseleta.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -14,26 +28,31 @@ public class Endereco {
     @Column(name = "endereco_id")
     private Integer id;
 
+    // @JsonIgnore: ao retornar um endereço em JSON, não inclui o usuário completo.
+    //   O frontend não precisa dos dados do usuário dentro de cada endereço.
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
     @Column(nullable = false)
-    private String rua;
+    private String rua; // Ex: "Rua das Flores, 123"
 
     @Column(nullable = false)
-    private String cidade;
+    private String cidade; // Ex: "São Paulo"
 
     @Column(nullable = false)
-    private String estado;
+    private String estado; // Ex: "SP"
 
     @Column(nullable = false)
-    private String cep;
+    private String cep; // Ex: "01310-100"
 
+    // Indica se este é o endereço padrão do usuário.
+    // No checkout, o endereço principal é pré-selecionado.
     @Column(nullable = false)
-    private Boolean principal = false;
+    private Boolean principal = false; // Padrão: não é o principal
 
+    // Getters e Setters
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
 

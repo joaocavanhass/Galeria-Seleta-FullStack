@@ -1,3 +1,9 @@
+// ============================================================
+// ARQUIVO: OpcaoFreteResponse.java
+// FUNÇÃO: DTO de saída com os dados de uma opção de frete.
+// Retornado pelo GET /api/frete para o frontend listar as opções de entrega.
+// ============================================================
+
 package com.galeriaseleta.dto.response;
 
 import com.galeriaseleta.model.OpcaoFrete;
@@ -6,10 +12,10 @@ import java.math.BigDecimal;
 public class OpcaoFreteResponse {
 
     private Integer id;
-    private String nome;
-    private Integer prazoMinimo;
-    private Integer prazoMaximo;
-    private BigDecimal preco;
+    private String nome;          // "Padrão" ou "Expresso"
+    private Integer prazoMinimo;  // Prazo mínimo em dias úteis
+    private Integer prazoMaximo;  // Prazo máximo em dias úteis
+    private BigDecimal preco;     // Custo do frete em reais
 
     public static OpcaoFreteResponse from(OpcaoFrete frete) {
         OpcaoFreteResponse dto = new OpcaoFreteResponse();

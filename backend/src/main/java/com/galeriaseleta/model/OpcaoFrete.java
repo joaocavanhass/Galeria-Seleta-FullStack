@@ -1,3 +1,15 @@
+// ============================================================
+// ARQUIVO: OpcaoFrete.java
+// FUNÇÃO: Model que representa a tabela "opcoes_frete" no banco.
+// Define as opções de entrega disponíveis na loja.
+// Os dados iniciais são inseridos pelo AdminInitializer:
+// - Padrão: R$29,90 / 5 a 7 dias úteis
+// - Expresso: R$54,90 / 1 a 3 dias úteis
+//
+// CONEXÕES: listado pelo FreteController (GET /api/frete),
+// selecionado no checkout e salvo no Pedido.
+// ============================================================
+
 package com.galeriaseleta.model;
 
 import jakarta.persistence.*;
@@ -13,17 +25,21 @@ public class OpcaoFrete {
     private Integer id;
 
     @Column(nullable = false)
-    private String nome;
+    private String nome; // Ex: "Padrão" ou "Expresso"
 
+    // Prazo mínimo de entrega em dias úteis
     @Column(name = "prazo_minimo", nullable = false)
     private Integer prazoMinimo;
 
+    // Prazo máximo de entrega em dias úteis
     @Column(name = "prazo_maximo", nullable = false)
     private Integer prazoMaximo;
 
+    // Custo do frete em reais
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal preco;
 
+    // Getters e Setters
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
 
